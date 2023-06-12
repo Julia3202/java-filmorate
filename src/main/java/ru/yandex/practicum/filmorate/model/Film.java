@@ -11,6 +11,7 @@ import java.time.LocalDate;
 @Getter
 @Setter
 //@Builder.Default
+
 public class Film {
     private int id;
     @NotBlank

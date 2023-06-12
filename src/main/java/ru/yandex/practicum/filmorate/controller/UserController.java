@@ -74,10 +74,4 @@ public class UserController {
         }
     }
 
-  /*  @ExceptionHandler
-    @ResponseStatus(code = HttpStatus.BAD_REQUEST)
-    public ErrorResponse handlerException(final Exception e) {
-        log.warn("Error: ", e);
-        return new ErrorResponse("Error: ", e.getMessage());
-    }*/
 }

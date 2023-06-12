@@ -73,4 +73,5 @@ class UserValidationTest {
         User result = controller.create(user2);
         assertEquals(user2, result, "Test Birthday with exception is done.");
     }
+
 }

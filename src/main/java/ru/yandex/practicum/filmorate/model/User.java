@@ -32,14 +32,6 @@ public class User {
         this.birthday = birthday;
     }
 
-/*
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public int getId() {
-        return id;
-    }*/
 
     public String getEmail() {
         return email;
