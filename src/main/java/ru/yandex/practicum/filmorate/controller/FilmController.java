@@ -7,6 +7,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.validation.FilmValidation;
 
 import javax.validation.Valid;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -51,16 +52,12 @@ public class FilmController {
     }
 
     @GetMapping("/films")
-    public Map<Integer, Film> findAll() throws ValidationException {
+    public Collection<Film> findAll() throws ValidationException {
         if (films.isEmpty()) {
             throw new ValidationException("Список фильмов пока пуст.");
         } else {
-          /*  List<Film> filmArray = new ArrayList<>();
-            for(Film film : films.values()){
-                filmArray.add(film);
-            }*/
             log.debug("Текущее количество фильмов: {}.", films.size());
-            return films;
+            return films.values();
         }
     }
 }

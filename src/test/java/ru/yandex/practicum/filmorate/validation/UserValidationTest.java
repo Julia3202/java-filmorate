@@ -1,15 +1,12 @@
 package ru.yandex.practicum.filmorate.validation;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import ru.yandex.practicum.filmorate.controller.UserController;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.time.LocalDate;
-import java.util.Map;
+import java.util.Collection;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -34,7 +31,7 @@ class UserValidationTest {
         assertEquals(user2, result, "Test Name with exception is done.");
         User user3 = new User("as3@mail.ru", "login3","", date.minusYears(20));
         User result2 = controller.create(user3);
-        Map<String, User> userList = controller.findAll();
+        Collection<User> userList = controller.findAll();
         System.out.println(userList);
         User result4 = controller.create(new User("mail@mail.ru","dolore", "Nick Name", LocalDate.of(1946, 8, 20)));
         System.out.println(result4);
@@ -55,7 +52,7 @@ class UserValidationTest {
         User user2 = new User("as@mail.ru", "login"," ", date);
         User result = controller.create(user2);
         User user3 = new User("as3@mail.ru", "login"," ", date);
-        Map<String, User> result2 = controller.update(result);
+        // Collection< User> result2 = controller.update(result);
         assertEquals(user2, result, "Test Email with exception is done.");
     }
 

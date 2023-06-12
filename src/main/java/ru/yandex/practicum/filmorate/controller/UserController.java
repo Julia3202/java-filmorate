@@ -1,13 +1,13 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.validation.UserValidation;
 
 import javax.validation.Valid;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,7 +16,8 @@ import java.util.Map;
 public class UserController {
     UserValidation validation = new UserValidation();
     private int id = 0;
-    private final Map<String, User> users = new HashMap<>();
+    private final Map<Integer, User> users = new HashMap<>();
+    private final Map<String, User> userEmail = new HashMap<>();
 
     public int generateId() {
         return ++id;
@@ -24,9 +25,10 @@ public class UserController {
 
     @PostMapping(value = "/users")
     public User create(@Valid @RequestBody User user) throws ValidationException {
-      /*  if (users.containsKey(user.getEmail())) {
+        if (userEmail.containsKey(user.getEmail())) {
             throw new ValidationException("Пользователь был зарегистрирован раньше.");
-        } else */if (user.getName() == null) {
+        }
+        if (user.getName() == null) {
             user.setName(user.getLogin());
         }
         if ((validation.validLogin(user)) && (validation.validName(user))
@@ -34,7 +36,8 @@ public class UserController {
             id = generateId();
             user.setId(id);
             log.debug("Пользователь {} добавлен", user.getName());
-            users.put(user.getEmail(), user);
+            userEmail.put(user.getEmail(), user);
+            users.put(user.getId(), user);
             return user;
         } else {
             throw new ValidationException("exception");
@@ -43,8 +46,10 @@ public class UserController {
 
 
     @PutMapping("/users")
-    public Map<String, User>  update(@Valid @RequestBody User user) throws ValidationException {
-        if (!users.containsKey(user.getEmail())) {
+    public User update(@Valid @RequestBody User user) throws ValidationException {
+        User exsist = users.get(user.getId());
+        User exsistByEmail = userEmail.get(user.getEmail());
+        if (exsistByEmail != null && exsistByEmail != exsist) {
             throw new ValidationException("Пользователь не был зарегистрирован.");
         } else if ((validation.validLogin(user)) && (validation.validEmail(user))
                 && (validation.validBirthday(user)) && (validation.validName(user))) {
@@ -52,8 +57,10 @@ public class UserController {
                 user.setName(user.getLogin());
             }
             log.debug("Информация о пользователе {} была изменена.", user.getName());
-            users.put(user.getEmail(), user);
-            return users;
+            userEmail.remove(exsist.getEmail());
+            userEmail.put(user.getEmail(), user);
+            users.put(user.getId(), user);
+            return user;
         } else {
             throw new ValidationException("Ошибка валидации");
         }
@@ -61,16 +68,12 @@ public class UserController {
 
 
     @GetMapping("/users")
-    public Map<String, User> findAll() throws ValidationException {
+    public Collection<User> findAll() throws ValidationException {
         if (users.isEmpty()) {
             throw new ValidationException("Текущее количество пользователей: 0");
         } else {
-         /*   Map<Integer, User> userArray = new HashMap<>();
-            for(User user : users.values()){
-                userArray.put(user.getId(), user);
-            }*/
             log.debug("Текущее количество пользователей: {}", users.size());
-            return users;
+            return users.values();
         }
     }
 
