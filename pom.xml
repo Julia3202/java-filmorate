@@ -38,12 +38,6 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-validation</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>org.microprofile-ext.restclient-ext</groupId>
-			<artifactId>configurable-errorresponse-handler</artifactId>
-			<version>1.0.0</version>
-			<scope>test</scope>
-		</dependency>
 	</dependencies>
 
 	<build>

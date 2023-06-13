@@ -11,8 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class FilmValidationTest {
-    FilmValidation validation = new FilmValidation();
-    FilmController controller = new FilmController();
+    private final FilmController controller = new FilmController();
 
     @Test
     void validName() throws ValidationException {
@@ -20,12 +19,12 @@ class FilmValidationTest {
         ValidationException exseption = assertThrows(
                 ValidationException.class,
                 () -> {
-                    Film film = new Film(" ", "описание", date, 25);
+                    Film film = new Film(0, " ", "описание", date, 25);
                     controller.create(film);
                 });
         assertEquals("Поле 'название' не может быть пустым", exseption.getMessage());
 
-        Film film2 = new Film("testName", "testDescription", date, 120);
+        Film film2 = new Film(1, "testName", "testDescription", date, 120);
         Film result = controller.create(film2);
         assertEquals(film2, result, "Test Name with exception is done.");
 
@@ -38,16 +37,16 @@ class FilmValidationTest {
                 ValidationException.class,
                 () -> {
                     LocalDate date = LocalDate.of(1894, 12, 28);
-                    Film film = new Film("фильм", "описание", date, 25);
+                    Film film = new Film(0, "фильм", "описание", date, 25);
                     controller.create(film);
                 });
         assertEquals("Дата релиза — не может быть раньше 28 декабря 1895 года", exseption.getMessage(),
                 "Test Date with exception is done.");
 
-        Film film2 = new Film("testName", "testDescription", date2, 120);
-        Film result = controller.create(film2);
-        Film result2 = controller.update(result);
-        assertEquals(film2, result2, "Test Data is done.");
+        Film films = new Film(1, "testName", "testDescription", date2, 120);
+        Film result = controller.create(films);
+        Film results = controller.update(result);
+        assertEquals(films, results, "Test Data is done.");
 
 
     }
@@ -61,15 +60,15 @@ class FilmValidationTest {
                     String exp = "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF" +
                             "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF" +
                             "FFFFFFFFFFFFFFFFFFFFFFFFFFFFF";
-                    Film film = new Film("фильм", exp, date, 25);
+                    Film film = new Film(0, "фильм", exp, date, 25);
                     controller.create(film);
                 });
         assertEquals("Максимальная длина описания — 200 символов", exseption.getMessage(),
                 "Test Description with exception is done.");
 
-        Film film2 = new Film("testName", "testDescription", date, 120);
-        Film result = controller.create(film2);
-        assertEquals(film2, result, "Test Description is done.");
+        Film films = new Film(1, "testName", "testDescription", date, 120);
+        Film result = controller.create(films);
+        assertEquals(films, result, "Test Description is done.");
     }
 
     @Test
@@ -78,17 +77,16 @@ class FilmValidationTest {
         ValidationException exseption = assertThrows(
                 ValidationException.class,
                 () -> {
-                    Film film = new Film("фильм", "описание", date, -200);
+                    Film film = new Film(0, "фильм", "описание", date, -200);
                     controller.create(film);
                 });
         assertEquals("Продолжительность фильма должна быть положительной", exseption.getMessage());
-        Film film2 = new Film("testName", "testDescription", date, 120);
-        Film result = controller.create(film2);
-
-        Film film3 = new Film("testName2", "testDescription2", date, 121);
-        Film result2 = controller.create(film3);
+        Film films = new Film(1, "testName", "testDescription", date, 120);
+        Film result = controller.create(films);
+        Film filmses = new Film(2, "testName2", "testDescription2", date, 121);
+        Film result2 = controller.create(filmses);
         System.out.println(result + "\n" + result2);
-        assertEquals(film2, result, "Test Duration is done.");
+        assertEquals(films, result, "Test Duration is done.");
         assertEquals("testName", result.getName());
         assertEquals("testDescription", result.getDescription());
         assertEquals(date, result.getReleaseDate());

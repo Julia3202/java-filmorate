@@ -13,13 +13,12 @@ import java.util.Map;
 
 @Slf4j
 @RestController
-
 public class FilmController {
-    private int id = 0;
-    FilmValidation validation = new FilmValidation();
+    private static int id = 0;
+    private final FilmValidation validation = new FilmValidation();
     private final Map<Integer, Film> films = new HashMap<>();
 
-    public int generateId() {
+    public static int generateId() {
         return ++id;
     }
 

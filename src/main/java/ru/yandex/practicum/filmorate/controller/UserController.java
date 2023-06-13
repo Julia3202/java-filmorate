@@ -14,12 +14,12 @@ import java.util.Map;
 @Slf4j
 @RestController
 public class UserController {
-    UserValidation validation = new UserValidation();
-    private int id = 0;
+    private final UserValidation validation = new UserValidation();
+    private static int id = 0;
     private final Map<Integer, User> users = new HashMap<>();
     private final Map<String, User> userEmail = new HashMap<>();
 
-    public int generateId() {
+    public static int generateId() {
         return ++id;
     }
 
@@ -27,9 +27,6 @@ public class UserController {
     public User create(@Valid @RequestBody User user) throws ValidationException {
         if (userEmail.containsKey(user.getEmail())) {
             throw new ValidationException("Пользователь был зарегистрирован раньше.");
-        }
-        if (user.getName() == null) {
-            user.setName(user.getLogin());
         }
         if ((validation.validLogin(user)) && (validation.validName(user))
                 && (validation.validEmail(user)) && (validation.validBirthday(user))) {

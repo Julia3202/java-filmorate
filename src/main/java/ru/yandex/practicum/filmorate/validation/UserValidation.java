@@ -9,14 +9,14 @@ import java.time.LocalDate;
 @Slf4j
 public class UserValidation {
     public boolean validName(User user) {
-        if (user.getName().isBlank()) {
+        if (user.getName() == null || user.getName().isBlank()) {
             user.setName(user.getLogin());
         }
         return true;
     }
 
     public boolean validLogin(User user) throws ValidationException {
-        if (user.getLogin().isBlank()) {
+        if (user.getLogin() == null || user.getLogin().isBlank()) {
             log.warn("Поле 'login' не должно быть пустым.");
             throw new ValidationException("Поле 'login' не должно быть пустым.");
         } else {
@@ -34,7 +34,7 @@ public class UserValidation {
     }
 
     public boolean validBirthday(User user) throws ValidationException {
-        if (user.getBirthday().isAfter(LocalDate.now())) {
+        if (String.valueOf(user.getBirthday()) == null || user.getBirthday().isAfter(LocalDate.now())) {
             log.warn("Дата рождения не может быть в будущем.");
             throw new ValidationException("Дата рождения не может быть в будущем.");
         } else {

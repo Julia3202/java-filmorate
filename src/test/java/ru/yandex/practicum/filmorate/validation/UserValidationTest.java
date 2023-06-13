@@ -6,14 +6,12 @@ import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.time.LocalDate;
-import java.util.Collection;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class UserValidationTest {
-    UserValidation validation = new UserValidation();
-    UserController controller = new UserController();
+    private final UserController controller = new UserController();
 
 
     @Test
@@ -22,21 +20,13 @@ class UserValidationTest {
         ValidationException exseption = assertThrows(
                 ValidationException.class,
                 () -> {
-                    User user = new User("as@mail.ru", " ", "name", date);
+                    User user = new User(1, "as@mail.ru", " ", "name", date);
                     controller.create(user);
                 });
         assertEquals("Поле 'login' не должно быть пустым.", exseption.getMessage());
-        User user2 = new User("as2@mail.ru", "login2", "name2", date);
-        User result = controller.create(user2);
-        assertEquals(user2, result, "Test Name with exception is done.");
-        User user3 = new User("as3@mail.ru", "login3","", date.minusYears(20));
-        User result2 = controller.create(user3);
-        Collection<User> userList = controller.findAll();
-        System.out.println(userList);
-        User result4 = controller.create(new User("mail@mail.ru","dolore", "Nick Name", LocalDate.of(1946, 8, 20)));
-        System.out.println(result4);
-
-
+        User users = new User(1, "as2@mail.ru", "login2", "name2", date);
+        User result = controller.create(users);
+        assertEquals(users, result, "Test Name with exception is done.");
     }
 
     @Test
@@ -45,15 +35,13 @@ class UserValidationTest {
         ValidationException exseption = assertThrows(
                 ValidationException.class,
                 () -> {
-                    User user = new User("a&?sma?l.ru", "login","name", date);
+                    User user = new User(0, "a&?sma?l.ru", "login", "name", date);
                     controller.create(user);
                 });
         assertEquals("Поле 'email' не может быть пустым и должен содержать символ '@'.", exseption.getMessage());
-        User user2 = new User("as@mail.ru", "login"," ", date);
-        User result = controller.create(user2);
-        User user3 = new User("as3@mail.ru", "login"," ", date);
-        // Collection< User> result2 = controller.update(result);
-        assertEquals(user2, result, "Test Email with exception is done.");
+        User users = new User(1, "as@mail.ru", "login", " ", date);
+        User result = controller.create(users);
+        assertEquals(users, result, "Test Email with exception is done.");
     }
 
     @Test
@@ -62,13 +50,12 @@ class UserValidationTest {
         ValidationException exseption = assertThrows(
                 ValidationException.class,
                 () -> {
-                    User user = new User("as@mail.ru", "login","name", date.plusYears(3));
+                    User user = new User(0, "as@mail.ru", "login", "name", date.plusYears(3));
                     controller.create(user);
                 });
         assertEquals("Дата рождения не может быть в будущем.", exseption.getMessage());
-        User user2 = new User("as@mail.ru", "login", "", date.minusYears(20));
-        User result = controller.create(user2);
-        assertEquals(user2, result, "Test Birthday with exception is done.");
+        User users = new User(1, "as@mail.ru", "login", "", date.minusYears(20));
+        User result = controller.create(users);
+        assertEquals(users, result, "Test Birthday with exception is done.");
     }
-
 }

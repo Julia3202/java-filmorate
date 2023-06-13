@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.model;
 
-import lombok.Builder;
-import lombok.Data;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,8 +9,7 @@ import java.time.LocalDate;
 
 @Getter
 @Setter
-//@Builder.Default
-
+@AllArgsConstructor
 public class Film {
     private int id;
     @NotBlank
@@ -19,20 +17,4 @@ public class Film {
     private String description;
     private LocalDate releaseDate;
     private long duration;
-
-    public Film(String name, String description, LocalDate releaseDate, long duration) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.releaseDate = releaseDate;
-        this.duration = duration;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public int getId() {
-        return id;
-    }
 }
