@@ -8,7 +8,7 @@ import java.time.LocalDate;
 
 @Slf4j
 public class FilmValidation {
-    private final LocalDate DATE_OF_FIRST_FILM = LocalDate.of(1895, 12, 28);
+    private final static LocalDate DATE_OF_FIRST_FILM = LocalDate.of(1895, 12, 28);
 
     public boolean validName(Film film) throws ValidationException {
         if ((film.getName() == null) || (film.getName().isBlank())) {
