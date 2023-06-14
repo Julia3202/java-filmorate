@@ -53,4 +53,13 @@ public class FilmValidation {
             return true;
         }
     }
+
+    public boolean validation(Film film) {
+        if (!(validName(film) && validDuration(film) && validDescription(film) && validReleaseDate(film))) {
+            log.warn("Проверьте введенные данные.");
+            throw new ValidationException("Валидация не была пройдена.");
+        } else {
+            return true;
+        }
+    }
 }

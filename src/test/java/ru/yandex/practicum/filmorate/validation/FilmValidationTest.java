@@ -23,16 +23,14 @@ class FilmValidationTest {
                     controller.create(film);
                 });
         assertEquals("Поле 'название' не может быть пустым", exseption.getMessage());
-
-        Film film2 = new Film(1, "testName", "testDescription", date, 120);
-        Film result = controller.create(film2);
-        assertEquals(film2, result, "Test Name with exception is done.");
-
+        Film films = new Film(1, "testName", "testDescription", date, 120);
+        Film result = controller.create(films);
+        assertEquals(films, result, "Test Name with exception is done.");
     }
 
     @Test
     void validReleaseDate() throws ValidationException {
-        LocalDate date2 = LocalDate.of(2021, 10, 5);
+        LocalDate dates = LocalDate.of(2021, 10, 5);
         ValidationException exseption = assertThrows(
                 ValidationException.class,
                 () -> {
@@ -42,13 +40,10 @@ class FilmValidationTest {
                 });
         assertEquals("Дата релиза — не может быть раньше 28 декабря 1895 года", exseption.getMessage(),
                 "Test Date with exception is done.");
-
-        Film films = new Film(1, "testName", "testDescription", date2, 120);
+        Film films = new Film(1, "testName", "testDescription", dates, 120);
         Film result = controller.create(films);
         Film results = controller.update(result);
         assertEquals(films, results, "Test Data is done.");
-
-
     }
 
     @Test
@@ -65,7 +60,6 @@ class FilmValidationTest {
                 });
         assertEquals("Максимальная длина описания — 200 символов", exseption.getMessage(),
                 "Test Description with exception is done.");
-
         Film films = new Film(1, "testName", "testDescription", date, 120);
         Film result = controller.create(films);
         assertEquals(films, result, "Test Description is done.");
@@ -92,6 +86,5 @@ class FilmValidationTest {
         assertEquals(date, result.getReleaseDate());
         assertEquals(0, result.getId());
         assertEquals(120, result.getDuration());
-
     }
 }

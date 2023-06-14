@@ -13,7 +13,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class UserValidationTest {
     private final UserController controller = new UserController();
 
-
     @Test
     void validLogin() throws ValidationException {
         LocalDate date = LocalDate.now();

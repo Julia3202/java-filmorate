@@ -28,16 +28,14 @@ public class UserController {
         if (userEmail.containsKey(user.getEmail())) {
             throw new ValidationException("Пользователь был зарегистрирован раньше.");
         }
-        if ((validation.validLogin(user)) && (validation.validName(user))
-                && (validation.validEmail(user)) && (validation.validBirthday(user))) {
-            id = generateId();
-            user.setId(id);
+        if (validation.validation(user)) {
+            user.setId(generateId());
             log.debug("Пользователь {} добавлен", user.getName());
             userEmail.put(user.getEmail(), user);
             users.put(user.getId(), user);
             return user;
         } else {
-            throw new ValidationException("exception");
+            throw new ValidationException("Пользователь не был добавлен.Ошибка валидации.");
         }
     }
 
@@ -48,18 +46,14 @@ public class UserController {
         User exsistByEmail = userEmail.get(user.getEmail());
         if (exsistByEmail != null && exsistByEmail != exsist) {
             throw new ValidationException("Пользователь не был зарегистрирован.");
-        } else if ((validation.validLogin(user)) && (validation.validEmail(user))
-                && (validation.validBirthday(user)) && (validation.validName(user))) {
-            if (user.getName() == null) {
-                user.setName(user.getLogin());
-            }
+        } else if (validation.validation(user)) {
             log.debug("Информация о пользователе {} была изменена.", user.getName());
             userEmail.remove(exsist.getEmail());
             userEmail.put(user.getEmail(), user);
             users.put(user.getId(), user);
             return user;
         } else {
-            throw new ValidationException("Ошибка валидации");
+            throw new ValidationException("Информация о пользователе не была изменена, ошибка валидации.");
         }
     }
 

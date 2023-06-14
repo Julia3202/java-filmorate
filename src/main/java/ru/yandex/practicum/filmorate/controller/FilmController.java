@@ -24,29 +24,26 @@ public class FilmController {
 
     @PostMapping(value = "/films")
     public Film create(@Valid @RequestBody Film film) throws ValidationException {
-        if ((validation.validName(film) && (validation.validDescription(film)) &&
-                (validation.validReleaseDate(film)) && (validation.validDuration(film)))) {
-            id = generateId();
-            film.setId(id);
-            films.put(id, film);
+        if (validation.validation(film)) {
+            film.setId(generateId());
+            films.put(film.getId(), film);
             log.debug("Фильм {} был добавлен.", film.getName());
             return film;
         } else {
-            throw new ValidationException("exception");
+            throw new ValidationException("Фильм не был добавлен.Ошибка валидации.");
         }
     }
 
     @PutMapping("/films")
     public Film update(@Valid @RequestBody Film film) throws ValidationException {
         if (!films.containsKey(film.getId())) {
-            throw new ValidationException("Данный фильм не был добавлен.");
-        } else if ((validation.validName(film) && (validation.validDescription(film)) &&
-                (validation.validReleaseDate(film)) && (validation.validDuration(film)))) {
+            throw new ValidationException("Данный фильм не был найден.");
+        } else if (validation.validation(film)) {
             log.debug("Информация о фильме {} была изменена.", film.getName());
-            films.put(id, film);
+            films.put(film.getId(), film);
             return film;
         } else {
-            throw new ValidationException("exception");
+            throw new ValidationException("Информация о фильме не была изменена, ошибка валидации.");
         }
     }
 
