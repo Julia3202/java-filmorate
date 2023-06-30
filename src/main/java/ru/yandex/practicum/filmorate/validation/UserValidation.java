@@ -42,13 +42,11 @@ public class UserValidation {
         }
     }
 
-    public boolean validation(User user) {
+    public boolean validate(User user) {
         if (validLogin(user) && (validName(user)) && (validEmail(user)) && (validBirthday(user))) {
             return true;
-        } else {
-            log.warn("Проверьте введенные данные.");
-            throw new ValidationException("Валидация не была пройдена.");
         }
+        return false;
     }
 
 }

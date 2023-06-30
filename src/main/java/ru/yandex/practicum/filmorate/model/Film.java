@@ -6,6 +6,7 @@ import lombok.Setter;
 
 import javax.validation.constraints.NotBlank;
 import java.time.LocalDate;
+import java.util.List;
 
 @Getter
 @Setter
@@ -17,4 +18,6 @@ public class Film {
     private String description;
     private LocalDate releaseDate;
     private long duration;
+    private List<Integer> userLike;
+    private Integer like = userLike.size();
 }

@@ -1,59 +1,66 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.exception.OtherException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.validation.FilmValidation;
+import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
 
 import javax.validation.Valid;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 @Slf4j
 @RestController
 public class FilmController {
-    private static int id = 0;
-    private final FilmValidation validation = new FilmValidation();
-    private final Map<Integer, Film> films = new HashMap<>();
+    private final InMemoryFilmStorage inMemoryFilmStorage;
+    private final FilmService filmService;
 
-    public static int generateId() {
-        return ++id;
+    @Autowired
+    public FilmController(InMemoryFilmStorage inMemoryFilmStorage, FilmService filmService) {
+        this.inMemoryFilmStorage = inMemoryFilmStorage;
+        this.filmService = filmService;
     }
 
     @PostMapping(value = "/films")
     public Film create(@Valid @RequestBody Film film) throws ValidationException {
-        if (validation.validation(film)) {
-            film.setId(generateId());
-            films.put(film.getId(), film);
-            log.debug("Фильм {} был добавлен.", film.getName());
-            return film;
-        } else {
-            throw new ValidationException("Фильм не был добавлен.Ошибка валидации.");
-        }
+        return inMemoryFilmStorage.create(film);
     }
 
     @PutMapping("/films")
     public Film update(@Valid @RequestBody Film film) throws ValidationException {
-        if (!films.containsKey(film.getId())) {
-            throw new ValidationException("Данный фильм не был найден.");
-        } else if (validation.validation(film)) {
-            log.debug("Информация о фильме {} была изменена.", film.getName());
-            films.put(film.getId(), film);
-            return film;
-        } else {
-            throw new ValidationException("Информация о фильме не была изменена, ошибка валидации.");
-        }
+        return inMemoryFilmStorage.update(film);
     }
 
     @GetMapping("/films")
-    public Collection<Film> findAll() throws ValidationException {
-        if (films.isEmpty()) {
-            throw new ValidationException("Список фильмов пока пуст.");
-        } else {
-            log.debug("Текущее количество фильмов: {}.", films.size());
-            return films.values();
-        }
+    public List<Film> findAll() throws NotFoundException {
+        return inMemoryFilmStorage.findAll();
     }
+
+    @GetMapping("/films/{id}")
+    public Film findFilmById(@PathVariable("id") Integer id) throws ClassNotFoundException, ValidationException {
+        return inMemoryFilmStorage.findFilmById(id);
+    }
+
+    @PutMapping("/films/{id}/like/{userId}")
+    public Integer likeFilm(@PathVariable("id") Integer id, @PathVariable("userId") Integer userId)
+            throws OtherException {
+         return filmService.likeFilm(id, userId);
+    }
+
+    @DeleteMapping("/films/{id}/like/{userId}")
+        public Integer removeFilm(@PathVariable("id") Integer id, @PathVariable("userId") Integer userId)
+            throws OtherException {
+            return filmService.removeFilm(id, userId);
+        }
+
+        @GetMapping("/films/popular?count={count}")
+    public List<Film> findListFirstFilm(@PathVariable("count") Integer count){
+        return filmService.findListFirstFilm(count);
+        }
+
+
 }

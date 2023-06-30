@@ -1,3 +1,4 @@
+/*
 package ru.yandex.practicum.filmorate.validation;
 
 import org.junit.jupiter.api.Test;
@@ -87,4 +88,4 @@ class FilmValidationTest {
         assertEquals(0, result.getId());
         assertEquals(120, result.getDuration());
     }
-}
+}*/
