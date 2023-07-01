@@ -7,17 +7,22 @@ import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.validation.FilmValidation;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Component
-public class InMemoryFilmStorage implements FilmStorage{
+public class InMemoryFilmStorage implements FilmStorage {
     private static int id = 0;
     private final FilmValidation validation = new FilmValidation();
     private final Map<Integer, Film> films = new HashMap<>();
+
     static int generateId() {
-        return ++InMemoryFilmStorage.id;
+        return ++id;
     }
+
     @Override
     public Film create(Film film) throws ValidationException {
         if (validation.validate(film)) {
@@ -47,20 +52,24 @@ public class InMemoryFilmStorage implements FilmStorage{
     public List<Film> findAll() throws NotFoundException {
         if (films.isEmpty()) {
             throw new NotFoundException("Список фильмов пока пуст.");
-        }else {
+        } else {
             log.debug("Текущее количество фильмов: {}.", films.size());
             return new ArrayList<>(films.values());
         }
     }
 
-    public Film findFilmById(Integer id) throws NotFoundException{
+    public Film findFilmById(Integer id) throws NotFoundException {
         if (films.isEmpty()) {
             throw new NotFoundException("Текущее количество фильмов: 0");
         }
-        if(films.get(id) == null){
+        if (films.get(id) == null) {
             throw new NotFoundException("Фильм с таким ID не найден.");
         }
         return films.get(id);
     }
 
+    @Override
+    public Map<Integer, Film> getFilms() {
+        return films;
+    }
 }

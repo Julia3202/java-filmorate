@@ -9,7 +9,6 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -31,64 +30,90 @@ public class UserService {
         }
     }
 
-    public List<Integer> addFriends(Integer friendId, Integer id) throws OtherException, NotFoundException {
+    public void addFriends(Integer friendId, Integer id) throws OtherException, NotFoundException {
+        if ((!(getUsers().containsKey(id))) || (!(getUsers().containsKey(friendId)))) {
+            throw new NotFoundException("Пользователь не найден.");
+        }
+        User userNow = getUsers().get(id);
+        List<Integer> friend;
+        if (userNow.getFriends() == null) {
+            friend = new ArrayList<>();
+        } else {
+            friend = userNow.getFriends();
+        }
+        if (friend.contains(friendId)) {
+            throw new OtherException("Пользователь не может быть добавлен повторно.");
+        }
+        friend.add(friendId);
+        User userFriend = getUsers().get(friendId);
+        List<Integer> friendList;
+        if (userFriend.getFriends() == null) {
+            friendList = new ArrayList<>();
+        } else {
+            friendList = userFriend.getFriends();
+        }
+        friendList.add(id);
+        userFriend.setFriends(friendList);
+    }
+
+    public void removeFriends(Integer friendId, Integer id) throws NotFoundException {
+        if ((!(getUsers().containsKey(id))) || (!(getUsers().containsKey(friendId)))) {
+            throw new NotFoundException("Пользователь не найден.");
+        }
+        User userNow = getUsers().get(id);
+        List<Integer> friend;
+        if (userNow.getFriends() == null) {
+            log.info("Список друзей пуст.");
+            friend = new ArrayList<>();
+        } else {
+            friend = userNow.getFriends();
+            friend.remove(friendId);
+        }
+        User userFriend = getUsers().get(friendId);
+        List<Integer> friendList;
+        if (userFriend.getFriends() == null) {
+            log.info("Список друзей пуст.");
+        } else {
+            friendList = userFriend.getFriends();
+            friendList.remove(id);
+        }
+    }
+
+    public List<User> getAllFriends(Integer id) throws NotFoundException {
         if (!(getUsers().containsKey(id))) {
             throw new NotFoundException("Пользователь не найден.");
         }
         User userNow = getUsers().get(id);
-        List<Integer> friend = userNow.getFriends();
-        if (friend.contains(friendId)) {
-            throw new OtherException("Пользователь не может быть добавлен повторно.");
-        }
-        userNow.getFriends().add(friendId);
-        userNow.setFriends(friend);
-        return friend;
-    }
-
-    public List<Integer> removeFriends(Integer friendId, Integer id) throws NotFoundException {
-        if ((getUsers().containsKey(id))) {
-            throw new NotFoundException("Пользователь не найден.");
-        }
-        User userNow = getUsers().get(id);
-        List<Integer> friend = userNow.getFriends();
-        if (!(friend.contains(friendId))) {
-            throw new NotFoundException("Данного пользователя нет в списках ваших друзей.");
-        }
-        friend.remove(friendId);
-        userNow.setFriends(friend);
-        return friend;
-    }
-
-    public List<User> getAllFriends(int id) throws NotFoundException {
-        if ((getUsers().containsKey(id))) {
-            throw new NotFoundException("Пользователь не найден.");
-        }
-        User userNow = getUsers().get(id);
-        Map<Integer, User> friend = new HashMap<>();
-        if(userNow.getFriends() == null){
-            return new ArrayList<>();
+        List<User> friend = new ArrayList<>();
+        if (userNow.getFriends().isEmpty()) {
+            throw new NotFoundException("Список друзей пуст.");
         }
         for (Integer idFriend : userNow.getFriends()) {
-            friend.put(idFriend, getUsers().get(idFriend));
+            friend.add(getUsers().get(idFriend));
         }
-        return new ArrayList<>(friend.values());
+        return friend;
     }
 
-    public List<User> getMutualFriend(int id, Integer otherId) throws NotFoundException {
+    public List<User> getMutualFriend(Integer id, Integer otherId) throws NotFoundException {
         if (!(getUsers().containsKey(id)) || !(getUsers().containsKey(otherId))) {
             throw new NotFoundException("Пользователь не найден.");
         }
         List<User> mutualFriend = new ArrayList<>();
         User userNow = getUsers().get(id);
         User userFriend = getUsers().get(otherId);
+        if ((userNow.getFriends() == null) || (userFriend.getFriends() == null)) {
+            log.info("У Вас нет друзей в списке.");
+            return mutualFriend;
+        }
         List<Integer> friend = userFriend.getFriends();
         for (Integer idFriend : userNow.getFriends()) {
             if (friend.contains(idFriend)) {
                 mutualFriend.add(getUsers().get(idFriend));
             }
-        }
-        if(mutualFriend.isEmpty()){
-            return new ArrayList<>();
+            if (mutualFriend.isEmpty()) {
+                log.info("У вас нет общих друзей.");
+                return mutualFriend;
+            }
         }
         return mutualFriend;
     }

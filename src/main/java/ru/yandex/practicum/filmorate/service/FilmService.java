@@ -10,83 +10,79 @@ import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class FilmService {
-    private FilmStorage filmStorage;
-    private UserStorage userStorage;
+    private final FilmStorage filmStorage;
+    private final UserStorage userStorage;
 
     @Autowired
-    public FilmService(FilmStorage filmStorage, UserStorage userStorage){
+    public FilmService(FilmStorage filmStorage, UserStorage userStorage) {
         this.filmStorage = filmStorage;
         this.userStorage = userStorage;
     }
 
-    public List<Film> getFilms() throws NotFoundException {
-        if(filmStorage.findAll() == null){
+    public Map<Integer, Film> getFilms() throws NotFoundException {
+        if (filmStorage.findAll() == null) {
             throw new NotFoundException("Список фильмов пуст.");
         }
-        return filmStorage.findAll();
+        return filmStorage.getFilms();
     }
 
-    public List<User> getUsers() throws NotFoundException {
+    public Map<Integer, User> getUsers() throws NotFoundException {
         if (userStorage.findAll() == null) {
             throw new NotFoundException("Список пользователей пуст.");
         } else {
-            return userStorage.findAll();
+            return userStorage.getUsers();
         }
     }
 
-    public Integer likeFilm(Integer id, Integer userId) throws OtherException {
-        if (!getUsers().contains(userId)) {
+    public List<Integer> likeFilm(Integer id, Integer userId) throws OtherException {
+        if (getUsers().containsKey(userId)) {
             throw new NotFoundException("Пользователь не найден.");
         }
-        if(!getFilms().contains(id)){
+        if (getFilms().containsKey(id)) {
             throw new NotFoundException("Фильм не найден.");
         }
         Film film = getFilms().get(id);
-        if(film.getUserLike().contains(userId)){
+        if (film.getUserLike().get(userId) != null) {
             throw new OtherException("Нельзя оценивать фильм больше 1 раза.");
         }
         film.getUserLike().add(userId);
-        return film.getUserLike().size();
+        int like = film.getLike() + 1;
+        film.setLike(like);
+        return film.getUserLike();
     }
 
-    public Integer removeFilm(Integer id, Integer userId) throws OtherException {
-        if (!getUsers().contains(userId)) {
+    public void removeFilm(Integer id, Integer userId) throws OtherException {
+       /*if (getUsers().containsKey(userId)) {
             throw new NotFoundException("Пользователь не найден.");
-        }
-        if(!getFilms().contains(id)){
+        }*/
+        if (getFilms().containsKey(id)) {
             throw new NotFoundException("Фильм не найден.");
         }
         Film film = getFilms().get(id);
-        if(film.getUserLike().contains(userId)){
+        if (film.getUserLike().get(userId) == null) {
             throw new OtherException("Нельзя удалить оценку, если она не была поставлена.");
         }
         film.getUserLike().remove(userId);
-        return film.getUserLike().size();
+        int like = film.getLike() - 1;
+        film.setLike(like);
     }
 
 
     public List<Film> findListFirstFilm(Integer count) {
-        if(count == null){
+        if (count == null) {
             count = 10;
         }
-        Integer finalCount = count;
-        List<Film> films = getFilms();
-        return films.stream().sorted((f1, f2) -> {
-            int comp = f1.getLike().compareTo(f2.getLike());
-            List<Film> filmSort = new ArrayList<>();
-            for(int i = 0; i == finalCount-1; i++){
-                filmSort.add(films.get(i));
+        int finalCount = count;
+        List<Film> filmList = new ArrayList<>();
+        Set<Film> films = new TreeSet<>(Comparator.comparing(Film::getLike));
+        for (int i = 1; i == finalCount; i++) {
+            for (Film film : films) {
+                filmList.add(film);
             }
-            return comp;
-        }).limit(count).collect(Collectors.toList());
-       /* Collections.sort(films, new Comparator<Film>(){
-            public int compare(Film f1, Film f2){
-                return f1.getLike().compareTo(f2.getLike());
-            }
-        });*/
+        }
+        return filmList;
     }
 }

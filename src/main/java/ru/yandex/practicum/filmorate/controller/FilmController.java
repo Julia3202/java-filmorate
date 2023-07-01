@@ -46,21 +46,21 @@ public class FilmController {
     }
 
     @PutMapping("/films/{id}/like/{userId}")
-    public Integer likeFilm(@PathVariable("id") Integer id, @PathVariable("userId") Integer userId)
+    public List<Integer> likeFilm(@PathVariable("id") Integer id, @PathVariable("userId") Integer userId)
             throws OtherException {
-         return filmService.likeFilm(id, userId);
+        return filmService.likeFilm(id, userId);
     }
 
     @DeleteMapping("/films/{id}/like/{userId}")
-        public Integer removeFilm(@PathVariable("id") Integer id, @PathVariable("userId") Integer userId)
+    public void removeFilm(@PathVariable("id") Integer id, @PathVariable("userId") Integer userId)
             throws OtherException {
-            return filmService.removeFilm(id, userId);
-        }
+        filmService.removeFilm(id, userId);
+    }
 
-        @GetMapping("/films/popular?count={count}")
-    public List<Film> findListFirstFilm(@PathVariable("count") Integer count){
+    @GetMapping("/films/popular?count={count}")
+    public List<Film> findListFirstFilm(@PathVariable("count") Integer count) {
         return filmService.findListFirstFilm(count);
-        }
+    }
 
 
 }

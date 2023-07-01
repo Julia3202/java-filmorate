@@ -13,6 +13,8 @@ public interface UserStorage {
     User update(User user) throws ValidationException;
 
     List<User> findAll() throws ValidationException, NotFoundException;
+
     Map<Integer, User> getUsers();
+
     User findUserById(Integer id) throws NotFoundException, ValidationException;
 }
