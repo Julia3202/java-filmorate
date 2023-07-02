@@ -38,7 +38,7 @@ public class FilmController {
     }
 
     @GetMapping("/films/{id}")
-    public Film findFilmById(@PathVariable("id") Integer id) throws ClassNotFoundException, ValidationException {
+    public Film findFilmById(@PathVariable("id") Integer id) throws NotFoundException, ValidationException {
         return filmService.findFilmById(id);
     }
 
@@ -49,13 +49,13 @@ public class FilmController {
     }
 
     @DeleteMapping("/films/{id}/like/{userId}")
-    public void removeFilm(@PathVariable("id") Integer id, @PathVariable("userId") Integer userId)
+    public void removeLikeFilm(@PathVariable("id") Integer id, @PathVariable("userId") Integer userId)
             throws OtherException {
-        filmService.removeFilm(id, userId);
+        filmService.removeLikeFilm(id, userId);
     }
 
-    @GetMapping("/films/popular?count={count}")
-    public List<Film> findListFirstFilm(@PathVariable("count") Integer count) {
-        return filmService.findListFirstFilm(count);
+    @GetMapping("/films/popular")
+    public List<Film> findPopularFilm(@RequestParam(value = "count", defaultValue = "10") Integer count) {
+        return filmService.findPopularFilm(count);
     }
 }

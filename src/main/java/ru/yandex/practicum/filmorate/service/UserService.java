@@ -116,10 +116,6 @@ public class UserService {
             if (friend.contains(idFriend)) {
                 mutualFriend.add(getUsers().get(idFriend));
             }
-            if (mutualFriend.isEmpty()) {
-                log.info("У вас нет общих друзей.");
-                return mutualFriend;
-            }
         }
         return mutualFriend;
     }

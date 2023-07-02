@@ -9,7 +9,10 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class FilmService {
@@ -54,31 +57,32 @@ public class FilmService {
     }
 
     public List<Integer> likeFilm(Integer id, Integer userId) throws OtherException {
-        if (getUsers().containsKey(userId)) {
+        if (!getUsers().containsKey(userId)) {
             throw new NotFoundException("Пользователь не найден.");
         }
-        if (getFilms().containsKey(id)) {
+        if (!getFilms().containsKey(id)) {
             throw new NotFoundException("Фильм не найден.");
         }
         Film film = getFilms().get(id);
-        if (film.getUserLike().get(userId) != null) {
+        List<Integer> filmLike = film.getUserLike();
+        if (!(filmLike.isEmpty()) && (filmLike.contains(userId))) {
             throw new OtherException("Нельзя оценивать фильм больше 1 раза.");
         }
-        film.getUserLike().add(userId);
+        filmLike.add(userId);
         int like = film.getLike() + 1;
         film.setLike(like);
-        return film.getUserLike();
+        return filmLike;
     }
 
-    public void removeFilm(Integer id, Integer userId) throws OtherException {
-        if (getUsers().containsKey(userId)) {
+    public void removeLikeFilm(Integer id, Integer userId) throws OtherException {
+        if (!getUsers().containsKey(userId)) {
             throw new NotFoundException("Пользователь не найден.");
         }
-        if (getFilms().containsKey(id)) {
+        if (!getFilms().containsKey(id)) {
             throw new NotFoundException("Фильм не найден.");
         }
         Film film = getFilms().get(id);
-        if (film.getUserLike().get(userId) == null) {
+        if (!film.getUserLike().contains((userId))) {
             throw new OtherException("Нельзя удалить оценку, если она не была поставлена.");
         }
         film.getUserLike().remove(userId);
@@ -87,16 +91,20 @@ public class FilmService {
     }
 
 
-    public List<Film> findListFirstFilm(Integer count) {
-        if (count == null) {
-            count = 10;
-        }
+    public List<Film> findPopularFilm(Integer count) {
         int finalCount = count;
-        List<Film> filmList = new ArrayList<>();
-        Set<Film> films = new TreeSet<>(Comparator.comparing(Film::getLike));
-        for (int i = 1; i == finalCount; i++) {
-            filmList.addAll(films);
+        List<Film> filmList = new ArrayList<>(getFilms().values());
+        Collections.reverse(filmList);
+        List<Film> popularFilms = new ArrayList<>();
+        if (finalCount == 1) {
+            popularFilms.add(filmList.get(0));
+        } else if (finalCount < filmList.size()) {
+            for (int i = 0; i < finalCount; i++) {
+                popularFilms.add(filmList.get(i));
+            }
+        } else {
+            popularFilms.addAll(filmList);
         }
-        return filmList;
+        return popularFilms;
     }
 }

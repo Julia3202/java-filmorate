@@ -22,7 +22,7 @@ public class Film {
     private LocalDate releaseDate;
     private long duration;
     private List<Integer> userLike = new ArrayList<>();
-    private Integer like;
+    private Integer like = 0;
 
     public Film(String name, String description, LocalDate releaseDate, long duration) {
         this.name = name;
