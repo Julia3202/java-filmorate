@@ -17,21 +17,21 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleException(final OtherException e) {
-        log.info("Error", e);
+        log.error("Error 500: {}", "Произошла внутренняя ошибка сервера.");
         return new ErrorResponse(e.getMessage());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleNotFoundException(final NotFoundException e) {
-        log.info("Error ", e);
+        log.error("Error 404: {}", "Искомый объект не найден.");
         return new ErrorResponse(e.getMessage());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleBadRequest(final ValidationException e) {
-        log.info("Error", e);
+        log.error("Error 400: {}", "Ошибка валидации.");
         return new ErrorResponse(e.getMessage());
     }
 }

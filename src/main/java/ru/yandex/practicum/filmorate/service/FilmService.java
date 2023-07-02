@@ -22,6 +22,22 @@ public class FilmService {
         this.userStorage = userStorage;
     }
 
+    public Film create(Film film) {
+        return filmStorage.create(film);
+    }
+
+    public Film update(Film film) {
+        return filmStorage.update(film);
+    }
+
+    public List<Film> findAll() {
+        return filmStorage.findAll();
+    }
+
+    public Film findFilmById(Integer id) {
+        return filmStorage.findFilmById(id);
+    }
+
     public Map<Integer, Film> getFilms() throws NotFoundException {
         if (filmStorage.findAll() == null) {
             throw new NotFoundException("Список фильмов пуст.");
@@ -55,9 +71,9 @@ public class FilmService {
     }
 
     public void removeFilm(Integer id, Integer userId) throws OtherException {
-       /*if (getUsers().containsKey(userId)) {
+        if (getUsers().containsKey(userId)) {
             throw new NotFoundException("Пользователь не найден.");
-        }*/
+        }
         if (getFilms().containsKey(id)) {
             throw new NotFoundException("Фильм не найден.");
         }
@@ -79,9 +95,7 @@ public class FilmService {
         List<Film> filmList = new ArrayList<>();
         Set<Film> films = new TreeSet<>(Comparator.comparing(Film::getLike));
         for (int i = 1; i == finalCount; i++) {
-            for (Film film : films) {
-                filmList.add(film);
-            }
+            filmList.addAll(films);
         }
         return filmList;
     }

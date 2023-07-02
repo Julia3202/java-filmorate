@@ -8,7 +8,6 @@ import ru.yandex.practicum.filmorate.exception.OtherException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
-import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
 
 import javax.validation.Valid;
 import java.util.Collection;
@@ -17,35 +16,32 @@ import java.util.List;
 @Slf4j
 @RestController
 public class UserController {
-    private final InMemoryUserStorage inMemoryUserStorage;
     private final UserService userService;
 
     @Autowired
-    public UserController(InMemoryUserStorage inMemoryUserStorage, UserService userService) {
-        this.inMemoryUserStorage = inMemoryUserStorage;
+    public UserController(UserService userService) {
         this.userService = userService;
     }
 
     @PostMapping(value = "/users")
     public User create(@Valid @RequestBody User user) throws ValidationException {
-        return inMemoryUserStorage.create(user);
+        return userService.create(user);
     }
-
 
     @PutMapping("/users")
     public User update(@Valid @RequestBody User user) throws ValidationException {
-        return inMemoryUserStorage.update(user);
+        return userService.update(user);
     }
 
     @GetMapping("/users")
     public Collection<User> findAll() throws ClassNotFoundException {
-        return inMemoryUserStorage.findAll();
+        return userService.findAll();
     }
 
     @GetMapping("/users/{id}")
     public User findUserById(@PathVariable("id") Integer id)
             throws ClassNotFoundException, ValidationException {
-        return inMemoryUserStorage.findUserById(id);
+        return userService.findUserById(id);
     }
 
     @PutMapping("/users/{id}/friends/{friendId}")

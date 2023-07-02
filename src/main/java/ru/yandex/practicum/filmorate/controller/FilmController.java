@@ -8,7 +8,6 @@ import ru.yandex.practicum.filmorate.exception.OtherException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
-import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -16,33 +15,31 @@ import java.util.List;
 @Slf4j
 @RestController
 public class FilmController {
-    private final InMemoryFilmStorage inMemoryFilmStorage;
     private final FilmService filmService;
 
     @Autowired
-    public FilmController(InMemoryFilmStorage inMemoryFilmStorage, FilmService filmService) {
-        this.inMemoryFilmStorage = inMemoryFilmStorage;
+    public FilmController(FilmService filmService) {
         this.filmService = filmService;
     }
 
     @PostMapping(value = "/films")
     public Film create(@Valid @RequestBody Film film) throws ValidationException {
-        return inMemoryFilmStorage.create(film);
+        return filmService.create(film);
     }
 
     @PutMapping("/films")
     public Film update(@Valid @RequestBody Film film) throws ValidationException {
-        return inMemoryFilmStorage.update(film);
+        return filmService.update(film);
     }
 
     @GetMapping("/films")
     public List<Film> findAll() throws NotFoundException {
-        return inMemoryFilmStorage.findAll();
+        return filmService.findAll();
     }
 
     @GetMapping("/films/{id}")
     public Film findFilmById(@PathVariable("id") Integer id) throws ClassNotFoundException, ValidationException {
-        return inMemoryFilmStorage.findFilmById(id);
+        return filmService.findFilmById(id);
     }
 
     @PutMapping("/films/{id}/like/{userId}")
@@ -61,6 +58,4 @@ public class FilmController {
     public List<Film> findListFirstFilm(@PathVariable("count") Integer count) {
         return filmService.findListFirstFilm(count);
     }
-
-
 }

@@ -16,4 +16,6 @@ public interface FilmStorage {
     List<Film> findAll() throws NotFoundException;
 
     Map<Integer, Film> getFilms();
+
+    Film findFilmById(Integer id) throws NotFoundException;
 }

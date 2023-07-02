@@ -9,6 +9,7 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -22,12 +23,27 @@ public class UserService {
         this.userStorage = userStorage;
     }
 
+    public User create(User user) {
+        return userStorage.create(user);
+    }
+
+    public User update(User user) {
+        return userStorage.update(user);
+    }
+
+    public Collection<User> findAll() {
+        return userStorage.findAll();
+    }
+
+    public User findUserById(Integer id) {
+        return userStorage.findUserById(id);
+    }
+
     public Map<Integer, User> getUsers() throws NotFoundException {
         if (userStorage.getUsers().isEmpty()) {
             throw new NotFoundException("Список пользователей пуст.");
-        } else {
-            return userStorage.getUsers();
         }
+        return userStorage.getUsers();
     }
 
     public void addFriends(Integer friendId, Integer id) throws OtherException, NotFoundException {
@@ -35,23 +51,14 @@ public class UserService {
             throw new NotFoundException("Пользователь не найден.");
         }
         User userNow = getUsers().get(id);
-        List<Integer> friend;
-        if (userNow.getFriends() == null) {
-            friend = new ArrayList<>();
-        } else {
-            friend = userNow.getFriends();
-        }
+        List<Integer> friend = (userNow.getFriends() == null) ? new ArrayList<>() : userNow.getFriends();
+
         if (friend.contains(friendId)) {
             throw new OtherException("Пользователь не может быть добавлен повторно.");
         }
         friend.add(friendId);
         User userFriend = getUsers().get(friendId);
-        List<Integer> friendList;
-        if (userFriend.getFriends() == null) {
-            friendList = new ArrayList<>();
-        } else {
-            friendList = userFriend.getFriends();
-        }
+        List<Integer> friendList = (userNow.getFriends() == null) ? new ArrayList<>() : userFriend.getFriends();
         friendList.add(id);
         userFriend.setFriends(friendList);
     }
@@ -64,7 +71,6 @@ public class UserService {
         List<Integer> friend;
         if (userNow.getFriends() == null) {
             log.info("Список друзей пуст.");
-            friend = new ArrayList<>();
         } else {
             friend = userNow.getFriends();
             friend.remove(friendId);

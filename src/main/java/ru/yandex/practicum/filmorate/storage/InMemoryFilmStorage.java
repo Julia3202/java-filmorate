@@ -50,14 +50,16 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public List<Film> findAll() throws NotFoundException {
-        if (films.isEmpty()) {
+      /*  if (films.isEmpty()) {
             throw new NotFoundException("Список фильмов пока пуст.");
-        } else {
+        } */
             log.debug("Текущее количество фильмов: {}.", films.size());
             return new ArrayList<>(films.values());
-        }
+            //я правда не понимаю почему не выводится весь список,больше недели бьюсь с ним,раньше ошибок не было
+
     }
 
+    @Override
     public Film findFilmById(Integer id) throws NotFoundException {
         if (films.isEmpty()) {
             throw new NotFoundException("Текущее количество фильмов: 0");

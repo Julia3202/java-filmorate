@@ -15,7 +15,6 @@ import java.util.Map;
 
 @Slf4j
 @Component
-@Getter
 public class InMemoryUserStorage implements UserStorage {
 
     private final UserValidation validation = new UserValidation();
