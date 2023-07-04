@@ -12,9 +12,8 @@ public class FilmValidation {
         if ((film.getName() == null) || (film.getName().isBlank())) {
             log.warn("Поле 'название' не может быть пустым");
             throw new ValidationException("Поле 'название' не может быть пустым");
-        } else {
-            return true;
         }
+        return true;
     }
 
 
@@ -28,38 +27,34 @@ public class FilmValidation {
         if (film.getReleaseDate().isBefore(dateOfFirstFilm)) {
             log.warn("Дата релиза — не может быть раньше 28 декабря 1895 года");
             throw new ValidationException("Дата релиза — не может быть раньше 28 декабря 1895 года");
-        } else {
-            return true;
         }
+        return true;
     }
 
     public boolean validDescription(Film film) throws ValidationException {
         if (film.getDescription() == null || film.getDescription().isBlank()) {
             log.warn("Нет описания фильма.");
             throw new ValidationException("Необходимо указать описание фильма.");
-        } else if (film.getDescription().length() > 200) {
+        }
+        if (film.getDescription().length() > 200) {
             log.warn("Максимальная длина описания — 200 символов");
             throw new ValidationException("Максимальная длина описания — 200 символов");
-        } else {
-            return true;
         }
+        return true;
     }
 
     public boolean validDuration(Film film) throws ValidationException {
         if ((String.valueOf(film.getDuration()) == null) || (film.getDuration() <= 0)) {
             log.warn("Указана неверная продолжительность фильма.");
             throw new ValidationException("Продолжительность фильма должна быть положительной");
-        } else {
-            return true;
         }
+        return true;
     }
 
-    public boolean validation(Film film) {
-        if (!(validName(film) && validDuration(film) && validDescription(film) && validReleaseDate(film))) {
-            log.warn("Проверьте введенные данные.");
-            throw new ValidationException("Валидация не была пройдена.");
-        } else {
+    public boolean validate(Film film) {
+        if (validName(film) && validDuration(film) && validDescription(film) && validReleaseDate(film)) {
             return true;
         }
+        return false;
     }
 }
