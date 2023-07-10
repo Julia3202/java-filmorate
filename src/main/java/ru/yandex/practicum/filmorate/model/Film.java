@@ -23,6 +23,8 @@ public class Film {
     private long duration;
     private List<Integer> userLike = new ArrayList<>();
     private Integer like = 0;
+    private String nameCategory;
+    private String nameRating;
 
     public Film(String name, String description, LocalDate releaseDate, long duration) {
         this.name = name;
