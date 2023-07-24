@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dao.UserDbStorage;
@@ -10,12 +9,9 @@ import ru.yandex.practicum.filmorate.dao.UserRowMapper;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @Slf4j
@@ -87,11 +83,11 @@ public class UserService {
         String sqlQuery = "SELECT USERS.USER_ID, USERS.USER_NAME, USERS.USER_LOGIN, USERS.USER_BIRTHDAY, USERS.USER_EMAIL " +
                 "from USERS " +
                 "RIGHT JOIN USER_FRIEND UF on USERS.USER_ID = UF.FRIEND_ID where USERS.USER_ID =?";
-       if(jdbcTemplate.query(sqlQuery, new UserRowMapper(), id) == null){
-           log.info("У Вас нет друзей в списке.");
-           return new ArrayList<>();
-       }
-       return jdbcTemplate.query(sqlQuery, new UserRowMapper(), id);
+        if (jdbcTemplate.query(sqlQuery, new UserRowMapper(), id) == null) {
+            log.info("У Вас нет друзей в списке.");
+            return new ArrayList<>();
+        }
+        return jdbcTemplate.query(sqlQuery, new UserRowMapper(), id);
     }
 
     public List<User> getMutualFriend(Integer id, Integer otherId) throws NotFoundException {

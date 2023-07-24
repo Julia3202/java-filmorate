@@ -31,11 +31,6 @@ public class DaoController {
         return filmService.findGenreByIds(id);
     }
 
-  /*  @GetMapping("/genres/{id}")
-    public List<Film> findFilmByIdGenre(@PathVariable("id") Integer id) {
-        return filmService.findFilmByIdGenre(id);
-    }*/
-
     @GetMapping("/mpa")
     public List<Mpa> getAllMPA() {
         return filmService.getAllMpa();
@@ -45,5 +40,4 @@ public class DaoController {
     public Mpa getMpaById(@PathVariable("id") Integer id) {
         return filmService.getMpaById(id);
     }
-
 }

@@ -11,12 +11,13 @@ import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.validation.FilmValidation;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 @Slf4j
 @Component
@@ -33,7 +34,7 @@ public class JdbcFilmStorage implements FilmDbStorage {
 
     private void setGenreToFilm(Film film) {
         if (film.getGenre() != null && !film.getGenre().isEmpty()) {
-            for(Genre genres: film.getGenre()){
+            for (Genre genres : film.getGenre()) {
                 String sqlQuery = "insert into GENRE (FILM_ID, GENRE_ID) values(?, ?)";
                 jdbcTemplate.update(sqlQuery, film.getId(), genres.getId());
             }
@@ -51,7 +52,7 @@ public class JdbcFilmStorage implements FilmDbStorage {
             map.addValue("description", film.getDescription());
             map.addValue("release_date", film.getReleaseDate());
             map.addValue("duration", film.getDuration());
-            map.addValue( "mpa_id", film.getMpa().getId());
+            map.addValue("mpa_id", film.getMpa().getId());
             jdbcOperations.update(sqlQuery, map, keyHolder);
             film.setId(Objects.requireNonNull(keyHolder.getKey()).intValue());
         }

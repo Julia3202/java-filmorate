@@ -8,11 +8,7 @@ import java.util.List;
 public interface GenreDbStorage {
 
     Genre findGenreByIds(Integer id);
-    List<Genre> findAllGenre();
 
-    //List<Genre> findGenreFromFilm(Integer id);
-//
-//    void setsGenre(List<Film> films);
-//    void loadsGenre(List<Film> film);
+    List<Genre> findAllGenre();
     List<Film> findFilmByIdGenre(Integer id);
 }

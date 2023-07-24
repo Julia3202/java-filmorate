@@ -24,7 +24,7 @@ public class JdbsGenreStorage implements GenreDbStorage {
     public Genre findGenreByIds(Integer id) {
         String sqlQuery = "select GENRE_ID, GENRE_NAME from GENRE where GENRE_ID = :id";
         final List<Genre> genres = jdbcOperations.query(sqlQuery, Map.of("id", id), new GenreRowMapper());
-        if(genres.size() != 1){
+        if (genres.size() != 1) {
             throw new NotFoundException("Genre with id {} " + id + " not found.");
         }
         return genres.get(0);
@@ -35,30 +35,6 @@ public class JdbsGenreStorage implements GenreDbStorage {
         String sqlQuery = "select GENRE_ID, GENRE_NAME from GENRE";
         return jdbcOperations.query(sqlQuery, new GenreRowMapper());
     }
-
-  /*  @Override
-    public List<Genre> findGenreFromFilm(Integer id) {
-        return null;
-    }*/
-
-   /* @Override
-    public void setsGenre(List<Film> films) {
-// SQL DELETE FROM film_genres where film_id = film.get()
-        if (film.genres == null || film.genres.isEmpty()) {
-            return;
-        }
-        for (Genre genre : film.genres) {
-            // SQL INSERT INTO film_genres(film_id, genre_id) values (?,?)
-            // INSERT INTO film_genres(film_id, genre_id) values (?,?);
-            // INSERT INTO film_genres(film_id, genre_id) values (?,?);
-        }
-        // Или сделать через batch
-    }*/
-
-   /* @Override
-    public void loadsGenre(List<Film> film) {
-        film.genres = // SQL SELECT * FROM film_genres  where film_id = film.get()
-    }*/
 
     @Override
     public List<Film> findFilmByIdGenre(Integer id) {
