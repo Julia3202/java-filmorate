@@ -10,5 +10,6 @@ public interface GenreDbStorage {
     Genre findGenreByIds(Integer id);
 
     List<Genre> findAllGenre();
+
     List<Film> findFilmByIdGenre(Integer id);
 }
