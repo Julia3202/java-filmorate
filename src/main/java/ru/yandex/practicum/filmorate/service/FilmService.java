@@ -1,28 +1,38 @@
 package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.dao.*;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.OtherException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
 
-import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class FilmService {
-    private final FilmStorage filmStorage;
-    private final UserStorage userStorage;
+    private final FilmDbStorage filmStorage;
+    private final UserDbStorage userStorage;
+    private final GenreDbStorage genreDbStorage;
+    private final MpaDbStorage mpaDbStorage;
+    private final JdbcTemplate jdbcTemplate;
 
     @Autowired
-    public FilmService(FilmStorage filmStorage, UserStorage userStorage) {
+    public FilmService(FilmDbStorage filmStorage, UserDbStorage userStorage, GenreDbStorage genreDbStorage, MpaDbStorage mpaDbStorage, JdbcTemplate jdbcTemplate) {
         this.filmStorage = filmStorage;
         this.userStorage = userStorage;
+        this.genreDbStorage = genreDbStorage;
+        this.mpaDbStorage = mpaDbStorage;
+        this.jdbcTemplate = jdbcTemplate;
     }
 
     public Film create(Film film) {
@@ -41,70 +51,68 @@ public class FilmService {
         return filmStorage.findFilmById(id);
     }
 
-    public Map<Integer, Film> getFilms() throws NotFoundException {
-        if (filmStorage.findAll() == null) {
-            throw new NotFoundException("Список фильмов пуст.");
-        }
-        return filmStorage.getFilms();
+    public User findUserById(Integer id) {
+        return userStorage.findUserById(id);
     }
 
-    public Map<Integer, User> getUsers() throws NotFoundException {
-        if (userStorage.findAll() == null) {
-            throw new NotFoundException("Список пользователей пуст.");
-        } else {
-            return userStorage.getUsers();
-        }
-    }
-
-    public List<Integer> likeFilm(Integer id, Integer userId) throws OtherException {
-        if (!getUsers().containsKey(userId)) {
+    public Film likeFilm(Integer id, Integer userId) throws OtherException {
+        if (findUserById(userId) == null) {
             throw new NotFoundException("Пользователь не найден.");
         }
-        if (!getFilms().containsKey(id)) {
+        if (findFilmById(id) == null) {
             throw new NotFoundException("Фильм не найден.");
         }
-        Film film = getFilms().get(id);
-        List<Integer> filmLike = film.getUserLike();
-        if (!(filmLike.isEmpty()) && (filmLike.contains(userId))) {
+        SqlRowSet sqlQuery = jdbcTemplate.queryForRowSet("select user_id from USER_LIKE where FILM_ID = ?", id);
+        if (sqlQuery.next()) {
             throw new OtherException("Нельзя оценивать фильм больше 1 раза.");
         }
-        filmLike.add(userId);
-        int like = film.getLike() + 1;
-        film.setLike(like);
-        return filmLike;
+        String query = ("insert into USER_LIKE(FILM_ID, USER_ID) value(?, ?)");
+        jdbcTemplate.update(query, id, userId);
+
+        return findFilmById(id);
     }
 
     public void removeLikeFilm(Integer id, Integer userId) throws OtherException {
-        if (!getUsers().containsKey(userId)) {
+        if (findUserById(userId) == null) {
             throw new NotFoundException("Пользователь не найден.");
         }
-        if (!getFilms().containsKey(id)) {
+        if (findFilmById(id) == null) {
             throw new NotFoundException("Фильм не найден.");
         }
-        Film film = getFilms().get(id);
-        if (!film.getUserLike().contains((userId))) {
+        SqlRowSet sqlQuery = jdbcTemplate.queryForRowSet("select user_id from USER_LIKE where FILM_ID = ?", id);
+        if (sqlQuery.next()) {
+            String sqlQuerys = "delete from USER_LIKE where FILM_ID=? and USER_ID=?)";
+            jdbcTemplate.update(sqlQuerys, id, userId);
+        } else {
             throw new OtherException("Нельзя удалить оценку, если она не была поставлена.");
         }
-        film.getUserLike().remove(userId);
-        int like = film.getLike() - 1;
-        film.setLike(like);
+
     }
 
-
     public List<Film> findPopularFilm(Integer count) {
-        int finalCount = count;
-        List<Film> filmList = new ArrayList<>(getFilms().values());
-        Collections.reverse(filmList);
-        List<Film> popularFilms = new ArrayList<>();
-        if (finalCount == 1) {
-            popularFilms.add(filmList.get(0));
-        } else if (finalCount < filmList.size()) {
-            for (int i = 0; i < finalCount; i++) {
-                popularFilms.add(filmList.get(i));
-            }
-        } else {
-            popularFilms.addAll(filmList);
-        }
-        return popularFilms;
+        String sqlQuery = ("SELECT f.film_id, f.film_name, f.film_description, f.release_date, f.duration , f.genres_id, f.mpa_id" +
+                " FROM films f WHERE f.film_id in " +
+                "(SELECT u.film_id FROM user_like u GROUP BY u.film_id ORDER BY COUNT(u.user_id) DESC ) LIMIT ?");
+        return jdbcTemplate.query(sqlQuery, new FilmRowMapper(), count);
+    }
+
+    public Genre findGenreByIds(Integer id) {
+        return genreDbStorage.findGenreByIds(id);
+    }
+
+    public List<Genre> findAllGenre() {
+        return genreDbStorage.findAllGenre();
+    }
+
+    public List<Film> findFilmByIdGenre(Integer id) {
+        return genreDbStorage.findFilmByIdGenre(id);
+    }
+
+    public List<Mpa> getAllMpa() {
+        return mpaDbStorage.getAll();
+    }
+
+    public Mpa getMpaById(Integer id) {
+        return mpaDbStorage.getBYId(id);
     }
 }

@@ -6,9 +6,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -21,10 +21,17 @@ public class Film {
     private String description;
     private LocalDate releaseDate;
     private long duration;
-    private List<Integer> userLike = new ArrayList<>();
-    private Integer like = 0;
-    private String nameCategory;
-    private String nameRating;
+    private Set<Genre> genre;
+    @NotNull
+    private Mpa mpa;
+
+    public Film(int id, String name, String description, LocalDate releaseDate, long duration) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.releaseDate = releaseDate;
+        this.duration = duration;
+    }
 
     public Film(String name, String description, LocalDate releaseDate, long duration) {
         this.name = name;
