@@ -18,7 +18,7 @@ class FilmValidationTest {
     @BeforeEach
     public void beforeEach() {
         LocalDate date = LocalDate.of(2012, 5, 4);
-        film = new Film("testFilm", "testDescription", date, 1000);
+        film = new Film( "testFilm", "testDescription", date, 1000);
     }
 
     @Test

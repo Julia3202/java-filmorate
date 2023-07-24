@@ -1,25 +1,27 @@
 package ru.yandex.practicum.filmorate.service;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.dao.UserDbStorage;
+import ru.yandex.practicum.filmorate.dao.UserRowMapper;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.exception.OtherException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 @Service
 @Slf4j
 public class UserService {
-    private final UserStorage userStorage;
+    private final UserDbStorage userStorage;
 
-    @Autowired
-    public UserService(UserStorage userStorage) {
+    private final JdbcTemplate jdbcTemplate;
+
+    public UserService(JdbcTemplate jdbcTemplate, UserDbStorage userStorage) {
+        this.jdbcTemplate = jdbcTemplate;
         this.userStorage = userStorage;
     }
 
@@ -39,84 +41,65 @@ public class UserService {
         return userStorage.findUserById(id);
     }
 
-    public Map<Integer, User> getUsers() throws NotFoundException {
-        if (userStorage.getUsers().isEmpty()) {
-            throw new NotFoundException("Список пользователей пуст.");
-        }
-        return userStorage.getUsers();
-    }
 
-    public void addFriends(Integer friendId, Integer id) throws OtherException, NotFoundException {
-        if ((!(getUsers().containsKey(id))) || (!(getUsers().containsKey(friendId)))) {
+    public User addFriends(Integer friendId, Integer id) {
+        if ((findUserById(friendId) == null) || (findUserById(id) == null)) {
             throw new NotFoundException("Пользователь не найден.");
         }
-        User userNow = getUsers().get(id);
-        List<Integer> friend = (userNow.getFriends() == null) ? new ArrayList<>() : userNow.getFriends();
-
-        if (friend.contains(friendId)) {
-            throw new OtherException("Пользователь не может быть добавлен повторно.");
-        }
-        friend.add(friendId);
-        User userFriend = getUsers().get(friendId);
-        List<Integer> friendList = (userNow.getFriends() == null) ? new ArrayList<>() : userFriend.getFriends();
-        friendList.add(id);
-        userFriend.setFriends(friendList);
-    }
-
-    public void removeFriends(Integer friendId, Integer id) throws NotFoundException {
-        if ((!(getUsers().containsKey(id))) || (!(getUsers().containsKey(friendId)))) {
-            throw new NotFoundException("Пользователь не найден.");
-        }
-        User userNow = getUsers().get(id);
-        List<Integer> friend;
-        if (userNow.getFriends() == null) {
-            log.info("Список друзей пуст.");
+        SqlRowSet sqlQuery = jdbcTemplate.queryForRowSet("select USER_ID, FRIEND_ID " +
+                "from USER_FRIEND " +
+                "where FRIEND_ID = ?", friendId);
+        if (sqlQuery.next()) {
+            log.info("Пользователь {} уже есть у вас в друзьях.", friendId);
         } else {
-            friend = userNow.getFriends();
-            friend.remove(friendId);
+            String sqlQuerys = "insert into USER_FRIEND  (FRIEND_ID, USER_ID ) values ( ?, ? )";
+            jdbcTemplate.update(sqlQuerys, friendId, id);
         }
-        User userFriend = getUsers().get(friendId);
-        List<Integer> friendList;
-        if (userFriend.getFriends() == null) {
-            log.info("Список друзей пуст.");
-        } else {
-            friendList = userFriend.getFriends();
-            friendList.remove(id);
-        }
+        return findUserById(id);
+
+
     }
 
-    public List<User> getAllFriends(Integer id) throws NotFoundException {
-        if (!(getUsers().containsKey(id))) {
+    public User removeFriends(Integer friendId, Integer id) {
+        if ((findUserById(friendId) == null) || (findUserById(id) == null)) {
             throw new NotFoundException("Пользователь не найден.");
         }
-        User userNow = getUsers().get(id);
-        List<User> friend = new ArrayList<>();
-        if (userNow.getFriends().isEmpty()) {
-            throw new NotFoundException("Список друзей пуст.");
+        SqlRowSet sqlQuery = jdbcTemplate.queryForRowSet("select USER_ID, FRIEND_ID " +
+                "from USER_FRIEND " +
+                "where FRIEND_ID = ?", friendId);
+        if (sqlQuery.next()) {
+            String sqlQuerys = "delete from USER_FRIEND where FRIEND_ID=? AND USER_ID=? ";
+            jdbcTemplate.update(sqlQuerys, friendId, id);
+        } else {
+            log.info("Пользователь {} уже есть у вас в друзьях.", friendId);
         }
-        for (Integer idFriend : userNow.getFriends()) {
-            friend.add(getUsers().get(idFriend));
+        return findUserById(id);
+    }
+
+    public List<User> getAllFriends(Integer id) {
+        if (findUserById(id) == null) {
+            throw new NotFoundException("Пользователь не найден.");
         }
-        return friend;
+        String sqlQuery = "SELECT USERS.USER_ID, USERS.USER_NAME, USERS.USER_LOGIN, USERS.USER_BIRTHDAY, USERS.USER_EMAIL " +
+                "from USERS " +
+                "RIGHT JOIN USER_FRIEND UF on USERS.USER_ID = UF.FRIEND_ID where USERS.USER_ID =?";
+        if (jdbcTemplate.query(sqlQuery, new UserRowMapper(), id) == null) {
+            log.info("У Вас нет друзей в списке.");
+            return new ArrayList<>();
+        }
+        return jdbcTemplate.query(sqlQuery, new UserRowMapper(), id);
     }
 
     public List<User> getMutualFriend(Integer id, Integer otherId) throws NotFoundException {
-        if (!(getUsers().containsKey(id)) || !(getUsers().containsKey(otherId))) {
+        if ((findUserById(otherId) == null) || (findUserById(id) == null)) {
             throw new NotFoundException("Пользователь не найден.");
         }
-        List<User> mutualFriend = new ArrayList<>();
-        User userNow = getUsers().get(id);
-        User userFriend = getUsers().get(otherId);
-        if ((userNow.getFriends() == null) || (userFriend.getFriends() == null)) {
+        if ((getAllFriends(id).isEmpty()) || (getAllFriends(otherId).isEmpty())) {
             log.info("У Вас нет друзей в списке.");
-            return mutualFriend;
         }
-        List<Integer> friend = userFriend.getFriends();
-        for (Integer idFriend : userNow.getFriends()) {
-            if (friend.contains(idFriend)) {
-                mutualFriend.add(getUsers().get(idFriend));
-            }
-        }
-        return mutualFriend;
+        String query = "SELECT USER_ID, USER_NAME, USER_LOGIN, USER_BIRTHDAY, USER_EMAIL from USERS where USER_ID in" +
+                " (select f.FRIEND_ID from USER_FRIEND f  " +
+                "inner join USER_FRIEND u ON f.FRIEND_ID = u.FRIEND_ID where f.USER_ID=? AND u.USER_ID=?)";
+        return jdbcTemplate.query(query, new UserRowMapper(), id, otherId);
     }
 }
