@@ -12,5 +12,4 @@ public interface UserDbStorage {
     List<User> findAll();
 
     User findUserById(Integer id);
-
 }

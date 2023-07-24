@@ -40,5 +40,4 @@ public class DaoController {
     public Mpa getMpaById(@PathVariable("id") Integer id) {
         return filmService.getMpaById(id);
     }
-
 }
