@@ -75,7 +75,7 @@ public class JdbcUserStorage implements UserDbStorage {
     public User findUserById(Integer id) throws NotFoundException, ValidationException {
         String sqlQuery = "select USER_ID, USER_EMAIL, USER_NAME, USER_LOGIN, USER_BIRTHDAY " +
                 "from USERS where USER_ID= :userId";
-        final List<User> userList = jdbcOperations.query(sqlQuery, Map.of("userId", id), this::mapRow);
+        final List<User> userList = jdbcOperations.query(sqlQuery, Map.of("userId", id), new UserRowMapper());
         if (userList.size() != 1) {
             throw new NotFoundException("Пользователь с таким ID не найден.");
         }

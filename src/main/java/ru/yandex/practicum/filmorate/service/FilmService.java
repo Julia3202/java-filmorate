@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.service;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
@@ -44,7 +45,9 @@ public class FilmService {
     }
 
     public Film findFilmById(Integer id) {
-        return filmStorage.findFilmById(id);
+        Film film = filmStorage.findFilmById(id);
+        film.setMpa(getMpaById(id));
+        return film;
     }
 
     public User findUserById(Integer id) {
@@ -58,11 +61,12 @@ public class FilmService {
         if (findFilmById(id) == null) {
             throw new NotFoundException("Фильм не найден.");
         }
-        SqlRowSet sqlQuery = jdbcTemplate.queryForRowSet("select user_id from USER_LIKE where FILM_ID = ?", id);
+        SqlRowSet sqlQuery = jdbcTemplate.queryForRowSet("select film_id, user_id " +
+                "from FILM_LIKE where FILM_ID = ? AND USER_ID = ?", id, userId);
         if (sqlQuery.next()) {
             throw new OtherException("Нельзя оценивать фильм больше 1 раза.");
         }
-        String query = ("insert into USER_LIKE(FILM_ID, USER_ID) value(?, ?)");
+        String query = "insert into FILM_LIKE(FILM_ID, USER_ID) values(?, ?)";
         jdbcTemplate.update(query, id, userId);
 
         return findFilmById(id);
@@ -75,10 +79,11 @@ public class FilmService {
         if (findFilmById(id) == null) {
             throw new NotFoundException("Фильм не найден.");
         }
-        SqlRowSet sqlQuery = jdbcTemplate.queryForRowSet("select user_id from USER_LIKE where FILM_ID = ?", id);
+        SqlRowSet sqlQuery = jdbcTemplate.queryForRowSet("select film_id, user_id " +
+                "from FILM_LIKE where USER_ID = ?", userId);
         if (sqlQuery.next()) {
-            String sqlQuerys = "delete from USER_LIKE where FILM_ID=? and USER_ID=?)";
-            jdbcTemplate.update(sqlQuerys, id, userId);
+            String sqlQuerys = "delete from FILM_LIKE where USER_ID = ? and FILM_ID = ?)";
+            jdbcTemplate.update(sqlQuerys, userId, id);
         } else {
             throw new OtherException("Нельзя удалить оценку, если она не была поставлена.");
         }
@@ -88,7 +93,7 @@ public class FilmService {
     public List<Film> findPopularFilm(Integer count) {
         String sqlQuery = ("SELECT f.film_id, f.film_name, f.film_description, f.release_date, f.duration , f.genres_id, f.mpa_id" +
                 " FROM films f WHERE f.film_id in " +
-                "(SELECT u.film_id FROM user_like u GROUP BY u.film_id ORDER BY COUNT(u.user_id) DESC ) LIMIT ?");
+                "(SELECT u.film_id FROM film_like u GROUP BY u.film_id ORDER BY COUNT(u.user_id) DESC ) LIMIT ?");
         return jdbcTemplate.query(sqlQuery, new FilmRowMapper(), count);
     }
 

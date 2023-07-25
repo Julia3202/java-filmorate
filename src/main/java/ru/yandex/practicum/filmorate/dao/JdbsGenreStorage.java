@@ -39,7 +39,7 @@ public class JdbsGenreStorage implements GenreDbStorage {
     @Override
     public List<Film> findFilmByIdGenre(Integer id) {
         String sqlQuery = "select FILM_ID, FILM_NAME, FILM_DESCRIPTION, RELEASE_DATE, DURATION, MPA_ID, GENRES_ID" +
-                " from FILMS where GENRES_ID = :id";
+                " from FILMS where GENRES_ID = :id group by GENRES_ID";
         List<Film> films = jdbcOperations.query(sqlQuery, Map.of("id", id), new FilmRowMapper());
         return films;
     }

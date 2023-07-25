@@ -35,8 +35,8 @@ public class JdbcFilmStorage implements FilmDbStorage {
     private void setGenreToFilm(Film film) {
         if (film.getGenre() != null && !film.getGenre().isEmpty()) {
             for (Genre genres : film.getGenre()) {
-                String sqlQuery = "insert into GENRE (FILM_ID, GENRE_ID) values(?, ?)";
-                jdbcTemplate.update(sqlQuery, film.getId(), genres.getId());
+                String sqlQuery = "insert into GENRE (FILM_ID, GENRE_ID, GENRE_NAME) values(?, ?, ?)";
+                jdbcTemplate.update(sqlQuery, film.getId(), genres.getId(), genres.getName());
             }
         }
     }
@@ -84,10 +84,10 @@ public class JdbcFilmStorage implements FilmDbStorage {
     @Override
     public List<Film> findAll() throws NotFoundException {
         String sqlQuery =
-                "select FILM_ID, FILM_NAME, FILM_DESCRIPTION, RELEASE_DATE, DURATION, MPA_ID, GENRES_ID" +
-                        " from FILMS";
-        List<Film> filmList = jdbcOperations.query(sqlQuery, this::mapRow);
-        return filmList;
+                "select f.FILM_ID, f.FILM_NAME, f.FILM_DESCRIPTION, f.RELEASE_DATE, f.DURATION, G2.GENRE_ID," +
+                        " G2.GENRE_NAME, M.MPA_ID, M.MPA_NAME from FILMS f " +
+                        "inner join GENRE G2 on G2.GENRE_ID = f.GENRES_ID INNER JOIN MPA M on M.MPA_ID = f.MPA_ID";
+        return jdbcOperations.query(sqlQuery, this::mapRow);
     }
 
     @Override
@@ -100,7 +100,8 @@ public class JdbcFilmStorage implements FilmDbStorage {
         if (filmList.size() != 1) {
             throw new NotFoundException("Фильм с таким ID не найден.");
         }
-        return filmList.get(0);
+        Film film = filmList.get(0);
+        return film;
     }
 
     public Film mapRow(ResultSet rs, int rowNum) throws SQLException {
