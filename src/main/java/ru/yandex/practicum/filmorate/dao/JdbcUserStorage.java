@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.dao;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
@@ -16,8 +17,10 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 @Component
+@Slf4j
 public class JdbcUserStorage implements UserDbStorage {
     private final UserValidation validation = new UserValidation();
     private final NamedParameterJdbcOperations jdbcOperations;
@@ -47,7 +50,7 @@ public class JdbcUserStorage implements UserDbStorage {
 
     @Override
     public User update(User user) {
-        if (findUserById(user.getId()) == null) {
+        if (findUserById(user.getId()).isEmpty()) {
             throw new NotFoundException("Данный пользователь не был найден.");
         }
         String sqlQuery = "update USERS SET USER_EMAIL= :email , USER_NAME= :name, USER_LOGIN= :login," +
@@ -66,23 +69,71 @@ public class JdbcUserStorage implements UserDbStorage {
 
     @Override
     public List<User> findAll() throws NotFoundException {
-        String sqlQuery = "select USER_ID, USER_EMAIL, USER_NAME, USER_LOGIN, USER_BIRTHDAY FROM USERS";
-        List<User> userList = jdbcTemplate.query(sqlQuery, this::mapRow);
-        return userList;
+        String sqlQuery = "select * FROM USERS";
+        return jdbcTemplate.query(sqlQuery, (rs, rowNum) -> makeUser(rs));
     }
 
     @Override
-    public User findUserById(Integer id) throws NotFoundException, ValidationException {
-        String sqlQuery = "select USER_ID, USER_EMAIL, USER_NAME, USER_LOGIN, USER_BIRTHDAY " +
-                "from USERS where USER_ID= :userId";
-        final List<User> userList = jdbcOperations.query(sqlQuery, Map.of("userId", id), new UserRowMapper());
-        if (userList.size() != 1) {
-            throw new NotFoundException("Пользователь с таким ID не найден.");
+    public Optional<User> findUserById(Integer id) throws NotFoundException, ValidationException {
+        String sqlQuery = "select * from USERS where USER_ID= :userId";
+        List<User> userList = jdbcOperations.query(sqlQuery, Map.of("userId", id), (rs, rowNum) -> makeUser(rs));
+        if (!userList.isEmpty()) {
+            return Optional.of(userList.get(0));
         }
-        return userList.get(0);
+        log.info("Пользователь с таким ID не найден.");
+        return Optional.empty();
     }
 
-    public User mapRow(ResultSet rs, int rowNum) throws SQLException {
+    @Override
+    public void addFriends(Integer userId, Integer id) {
+        if ((findUserById(userId).isEmpty()) || (findUserById(id).isEmpty())) {
+            throw new NotFoundException("Пользователь не найден.");
+        }
+        String sqlQuery = "insert into USER_FRIEND (USER_ID, FRIEND_ID) values (:userId, :friendId)";
+        MapSqlParameterSource map = new MapSqlParameterSource();
+        map.addValue("userId", userId);
+        map.addValue("friendId", id);
+        jdbcOperations.update(sqlQuery, map);
+    }
+
+    @Override
+    public void removeFriends(Integer id, Integer friendId) {
+        if ((findUserById(friendId).isEmpty()) || (findUserById(id).isEmpty())) {
+            throw new NotFoundException("Пользователь не найден.");
+        }
+        String sqlQuery = "delete from USER_FRIEND where USER_ID = :userId and FRIEND_ID = :friendId";
+        MapSqlParameterSource map = new MapSqlParameterSource();
+        map.addValue("userId", id);
+        map.addValue("friendId", friendId);
+        jdbcOperations.update(sqlQuery, map);
+    }
+
+    @Override
+    public List<User> getAllFriends(Integer id) {
+        if (findUserById(id).isEmpty()) {
+            throw new NotFoundException("Пользователь не найден.");
+        }
+        String sqlQuery = "select u.* from USER_FRIEND uf join USERS u on uf.FRIEND_ID = u.USER_ID where uf.USER_ID = :id";
+
+        return jdbcOperations.query(sqlQuery, Map.of("id", id), (rs, rowNum) -> makeUser(rs));
+    }
+
+    @Override
+    public List<User> getMutualFriend(Integer id, Integer otherId) throws NotFoundException {
+        if ((findUserById(otherId).isEmpty()) || (findUserById(id).isEmpty())) {
+            throw new NotFoundException("Пользователь не найден.");
+        }
+        if ((getAllFriends(id).isEmpty()) || (getAllFriends(otherId).isEmpty())) {
+            log.info("У Вас нет друзей в списке.");
+        }
+        String query = "SELECT * from USERS where USER_ID in" +
+                " (select FRIEND_ID from USER_FRIEND where USER_ID = :userId " +
+                "intersect  select FRIEND_ID from USER_FRIEND where USER_ID = :otherId)";
+        return jdbcOperations.query(query, Map.of("userId", id, "otherId", otherId),
+                (rs, rowNum) -> makeUser(rs));
+    }
+
+    private User makeUser(ResultSet rs) throws SQLException {
         return new User(rs.getInt("USER_ID"),
                 rs.getString("USER_EMAIL"),
                 rs.getString("USER_LOGIN"),

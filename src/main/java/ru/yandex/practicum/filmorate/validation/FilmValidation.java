@@ -8,6 +8,7 @@ import java.time.LocalDate;
 
 @Slf4j
 public class FilmValidation {
+
     public boolean validName(Film film) throws ValidationException {
         if ((film.getName() == null) || (film.getName().isBlank())) {
             log.warn("Поле 'название' не может быть пустым");
@@ -15,7 +16,6 @@ public class FilmValidation {
         }
         return true;
     }
-
 
     public boolean validReleaseDate(Film film) throws ValidationException {
         LocalDate dateOfFirstFilm = LocalDate.of(1895, 12, 28);
@@ -44,7 +44,7 @@ public class FilmValidation {
     }
 
     public boolean validDuration(Film film) throws ValidationException {
-        if ((String.valueOf(film.getDuration()) == null) || (film.getDuration() <= 0)) {
+        if (film.getDuration() <= 0) {
             log.warn("Указана неверная продолжительность фильма.");
             throw new ValidationException("Продолжительность фильма должна быть положительной");
         }
@@ -52,9 +52,6 @@ public class FilmValidation {
     }
 
     public boolean validate(Film film) {
-        if (validName(film) && validDuration(film) && validDescription(film) && validReleaseDate(film)) {
-            return true;
-        }
-        return false;
+        return validName(film) && validDuration(film) && validDescription(film) && validReleaseDate(film);
     }
 }

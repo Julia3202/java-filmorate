@@ -41,7 +41,7 @@ public class UserController {
 
     @GetMapping("/{id}")
     public User findUserById(@PathVariable("id") Integer id)
-            throws ClassNotFoundException, ValidationException {
+            throws NotFoundException, ValidationException {
         return userService.findUserById(id);
     }
 

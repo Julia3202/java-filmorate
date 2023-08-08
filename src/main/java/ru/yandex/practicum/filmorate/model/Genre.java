@@ -5,8 +5,8 @@ import lombok.Getter;
 @Getter
 public class Genre {
 
-    private Integer id;
-    private String name;
+    private final Integer id;
+    private final String name;
 
     public Genre(Integer id, String name) {
         this.id = id;

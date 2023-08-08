@@ -43,10 +43,6 @@ public class UserValidation {
     }
 
     public boolean validate(User user) {
-        if (validLogin(user) && (validName(user)) && (validEmail(user)) && (validBirthday(user))) {
-            return true;
-        }
-        return false;
+        return validLogin(user) && (validName(user)) && (validEmail(user)) && (validBirthday(user));
     }
-
 }

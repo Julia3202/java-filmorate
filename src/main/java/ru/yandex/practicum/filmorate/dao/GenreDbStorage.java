@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.dao;
 
-import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 
 import java.util.List;
@@ -11,5 +10,9 @@ public interface GenreDbStorage {
 
     List<Genre> findAllGenre();
 
-    List<Film> findFilmByIdGenre(Integer id);
+    List<Genre> findGenreByFilmId(Integer id);
+
+    void deleteGenreOfFilm(Integer id);
+
+    void addGenreForFilm(Integer idGenre, Integer idFilm);
 }
