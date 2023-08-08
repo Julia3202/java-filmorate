@@ -32,7 +32,7 @@ class JdbcLikeFilmStorageTest {
     private UserDbStorage userDbStorage;
 
     @BeforeEach
-    public void beforeEach() {
+    void beforeEach() {
         LocalDate date = LocalDate.of(2012, 5, 4);
         Mpa mpa = new Mpa(5, "R-13");
         Film film = new Film(1, "testFilm", "testDescription", date, 1000, 5, mpa);

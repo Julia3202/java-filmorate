@@ -21,9 +21,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest
 @AutoConfigureTestDatabase
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
-@Sql(scripts = "classpath:data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+//@Sql(scripts = "/data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 class JdbcFilmStorageTest {
-    private final JdbcFilmStorage filmStorage;
+    private JdbcFilmStorage filmStorage;
 
     private Film film;
     private Mpa mpa;
@@ -33,7 +33,7 @@ class JdbcFilmStorageTest {
         LocalDate date = LocalDate.of(2012, 5, 4);
         mpa = new Mpa(5, "R-13");
         film = new Film(6, "testFilm", "testDescription", date, 1000, 5, mpa);
-        film.setGenres(List.of(new Genre(1, "Комедия")));
+        film.setGenres(List.of(new Genre(1, null)));
     }
 
     @Test
@@ -61,7 +61,7 @@ class JdbcFilmStorageTest {
         filmStorage.create(film);
         Film newFilm = new Film(6, "newFilm", "newDescription",
                 LocalDate.of(2005, 12, 30), 1000, 5, mpa);
-        newFilm.setGenres(List.of(new Genre(1, "Комедия"), new Genre(2, "Драма")));
+        newFilm.setGenres(List.of(new Genre(1, null), new Genre(2, null)));
 
         Film testFilm = filmStorage.update(newFilm);
 

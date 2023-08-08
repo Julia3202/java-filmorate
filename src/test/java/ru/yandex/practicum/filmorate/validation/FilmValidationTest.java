@@ -8,7 +8,6 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Mpa;
 
 import java.time.LocalDate;
-import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -21,8 +20,8 @@ class FilmValidationTest {
     @BeforeEach
     public void beforeEach() {
         LocalDate date = LocalDate.of(2012, 5, 4);
-        mpa = new Mpa (5, "R-13");
-        film = new Film( 1, "testFilm", "testDescription", date, 1000, 5, mpa);
+        mpa = new Mpa(5, "R-13");
+        film = new Film(1, "testFilm", "testDescription", date, 1000, 5, mpa);
     }
 
     @Test

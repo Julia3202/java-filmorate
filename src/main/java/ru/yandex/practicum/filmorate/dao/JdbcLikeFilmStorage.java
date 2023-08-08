@@ -29,8 +29,7 @@ public class JdbcLikeFilmStorage implements LikeFilmStorage {
                 "left join FILM_LIKE l on f.FILM_ID = l.FILM_ID " +
                 "group by f.FILM_ID " +
                 "order by rate desc limit :count");
-        return jdbcOperations.query(sqlQuery, Map.of("count", count)
-                , (rs, rowNum) -> filmDbStorage.makeFilm(rs));
+        return jdbcOperations.query(sqlQuery, Map.of("count", count), (rs, rowNum) -> filmDbStorage.makeFilm(rs));
     }
 
     @Override
