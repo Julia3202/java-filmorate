@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.jdbc.Sql;
 import ru.yandex.practicum.filmorate.dao.JdbcFilmStorage;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
@@ -21,9 +20,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest
 @AutoConfigureTestDatabase
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
-//@Sql(scripts = "/data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 class JdbcFilmStorageTest {
-    private JdbcFilmStorage filmStorage;
+    private final JdbcFilmStorage filmStorage;
 
     private Film film;
     private Mpa mpa;
@@ -32,7 +30,7 @@ class JdbcFilmStorageTest {
     public void beforeEach() {
         LocalDate date = LocalDate.of(2012, 5, 4);
         mpa = new Mpa(5, "R-13");
-        film = new Film(6, "testFilm", "testDescription", date, 1000, 5, mpa);
+        film = new Film(1, "testFilm", "testDescription", date, 1000L, 5, mpa);
         film.setGenres(List.of(new Genre(1, null)));
     }
 
@@ -41,11 +39,11 @@ class JdbcFilmStorageTest {
         Film newFilm = filmStorage.create(film);
 
         assertThat(newFilm)
-                .hasFieldOrPropertyWithValue("id", 6)
+                .hasFieldOrPropertyWithValue("id", 4)
                 .hasFieldOrPropertyWithValue("name", "testFilm")
                 .hasFieldOrPropertyWithValue("description", "testDescription")
                 .hasFieldOrPropertyWithValue("releaseDate", LocalDate.of(2012, 5, 4))
-                .hasFieldOrPropertyWithValue("duration", 1000)
+                .hasFieldOrPropertyWithValue("duration", 1000L)
                 .hasFieldOrPropertyWithValue("likes", 5);
 
         Integer genreId = newFilm.getGenres().stream()
@@ -59,18 +57,18 @@ class JdbcFilmStorageTest {
     @Test
     void update() {
         filmStorage.create(film);
-        Film newFilm = new Film(6, "newFilm", "newDescription",
-                LocalDate.of(2005, 12, 30), 1000, 5, mpa);
+        Film newFilm = new Film(1, "newFilm", "newDescription",
+                LocalDate.of(2005, 12, 30), 1000L, 5, mpa);
         newFilm.setGenres(List.of(new Genre(1, null), new Genre(2, null)));
 
         Film testFilm = filmStorage.update(newFilm);
 
         assertThat(testFilm)
-                .hasFieldOrPropertyWithValue("id", 6)
+                .hasFieldOrPropertyWithValue("id", 1)
                 .hasFieldOrPropertyWithValue("name", "newFilm")
                 .hasFieldOrPropertyWithValue("description", "newDescription")
                 .hasFieldOrPropertyWithValue("releaseDate", LocalDate.of(2005, 12, 30))
-                .hasFieldOrPropertyWithValue("duration", 1000)
+                .hasFieldOrPropertyWithValue("duration", 1000L)
                 .hasFieldOrPropertyWithValue("likes", 5);
         Integer mpaId = newFilm.getMpa().getId();
         assertThat(mpaId).isEqualTo(5);
@@ -86,14 +84,14 @@ class JdbcFilmStorageTest {
     @Test
     void findFilmById() {
         filmStorage.create(film);
-        Film filmStorageFilmById = filmStorage.findFilmById(6);
+        Film filmStorageFilmById = filmStorage.findFilmById(1);
 
         assertThat(filmStorageFilmById)
-                .hasFieldOrPropertyWithValue("id", 6)
-                .hasFieldOrPropertyWithValue("name", "testFilm")
-                .hasFieldOrPropertyWithValue("description", "testDescription")
-                .hasFieldOrPropertyWithValue("releaseDate", LocalDate.of(2012, 5, 4))
-                .hasFieldOrPropertyWithValue("duration", 1000)
+                .hasFieldOrPropertyWithValue("id", 1)
+                .hasFieldOrPropertyWithValue("name", "newFilm")
+                .hasFieldOrPropertyWithValue("description", "newDescription")
+                .hasFieldOrPropertyWithValue("releaseDate", LocalDate.of(2005, 12, 30))
+                .hasFieldOrPropertyWithValue("duration", 1000L)
                 .hasFieldOrPropertyWithValue("likes", 5);
     }
 }

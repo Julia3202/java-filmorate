@@ -24,12 +24,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 class JdbcLikeFilmStorageTest {
 
-    @Autowired
-    private FilmDbStorage filmDbStorage;
-    @Autowired
-    private LikeFilmStorage likeFilmStorage;
-    @Autowired
-    private UserDbStorage userDbStorage;
+    private final FilmDbStorage filmDbStorage;
+    private final LikeFilmStorage likeFilmStorage;
+    private final UserDbStorage userDbStorage;
 
     @BeforeEach
     void beforeEach() {
