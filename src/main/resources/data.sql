@@ -1,8 +1,9 @@
-delete from FILM_GENRE;
-delete from FILM_LIKE;
-delete from FILMS;
-delete from USER_FRIEND;
-delete from USERS;
+drop table if_exists FILM_GENRE cascade;
+drop table if_exists  FILM_LIKE cascade;
+drop table if_exists  FILMS cascade;
+drop table if_exists  USER_FRIEND cascade;
+drop table if_exists  USERS cascade;
+
 ALTER TABLE USERS ALTER COLUMN user_id RESTART WITH 1;
 ALTER TABLE FILMS ALTER COLUMN FILM_ID RESTART WITH 1;
 
