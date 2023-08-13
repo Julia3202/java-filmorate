@@ -1,4 +1,8 @@
-
+delete from FILM_GENRE;
+delete from FILM_LIKE;
+delete from FILMS;
+delete from USER_FRIEND;
+delete from USERS;
 
 ALTER TABLE USERS ALTER COLUMN user_id RESTART WITH 1;
 ALTER TABLE FILMS ALTER COLUMN FILM_ID RESTART WITH 1;
