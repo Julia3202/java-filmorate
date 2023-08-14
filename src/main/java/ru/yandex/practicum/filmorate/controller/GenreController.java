@@ -11,7 +11,6 @@ import ru.yandex.practicum.filmorate.service.GenreService;
 
 import java.util.List;
 
-@Slf4j
 @RestController
 @AllArgsConstructor
 @RequestMapping("/genres")
