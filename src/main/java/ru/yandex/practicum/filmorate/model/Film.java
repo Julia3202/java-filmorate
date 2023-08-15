@@ -7,6 +7,7 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.ArrayList;
 
 @Getter
 @Setter
@@ -18,7 +19,7 @@ public class Film {
     private String description;
     private LocalDate releaseDate;
     private long duration;
-    private List<Genre> genres;
+    private List<Genre> genres = new ArrayList<>();
     private Mpa mpa;
     private Integer likes;
 
