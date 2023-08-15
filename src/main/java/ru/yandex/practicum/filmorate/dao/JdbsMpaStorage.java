@@ -14,7 +14,6 @@ import java.util.Map;
 
 @Component
 @Slf4j
-
 @RequiredArgsConstructor
 public class JdbsMpaStorage implements MpaDbStorage {
 
