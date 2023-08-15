@@ -20,16 +20,12 @@ import java.util.Objects;
 import java.util.Optional;
 
 @Component
-@Slf4j
+@Slf4j    
+@RequiredArgsConstructor
 public class JdbcUserStorage implements UserDbStorage {
     private final UserValidation validation = new UserValidation();
     private final NamedParameterJdbcOperations jdbcOperations;
     private final JdbcTemplate jdbcTemplate;
-
-    public JdbcUserStorage(NamedParameterJdbcOperations jdbcOperations, JdbcTemplate jdbcTemplate) {
-        this.jdbcOperations = jdbcOperations;
-        this.jdbcTemplate = jdbcTemplate;
-    }
 
     @Override
     public User create(User user) throws ValidationException {
@@ -80,14 +76,17 @@ public class JdbcUserStorage implements UserDbStorage {
         if (!userList.isEmpty()) {
             return Optional.of(userList.get(0));
         }
-        log.info("Пользователь с таким ID не найден.");
+        log.info("Пользователь с ID = {} не найден.", user.getId());
         return Optional.empty();
     }
 
     @Override
     public void addFriends(Integer userId, Integer id) {
-        if ((findUserById(userId).isEmpty()) || (findUserById(id).isEmpty())) {
-            throw new NotFoundException("Пользователь не найден.");
+        if (findUserById(userId).isEmpty()) {
+            throw new NotFoundException("Пользователь с ID = {} не найден.", userId);
+        }
+        if (findUserById(id).isEmpty()) {
+            throw new NotFoundException("Пользователь с ID = {} не найден.", id);
         }
         String sqlQuery = "insert into USER_FRIEND (USER_ID, FRIEND_ID) values (:userId, :friendId)";
         MapSqlParameterSource map = new MapSqlParameterSource();
