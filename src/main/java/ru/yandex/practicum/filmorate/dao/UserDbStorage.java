@@ -21,7 +21,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 @Component
-@Slf4j    
+@Slf4j
 @RequiredArgsConstructor
 public class UserDbStorage implements UserStorage {
     private final UserValidation validation = new UserValidation();
