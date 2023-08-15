@@ -2,7 +2,7 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.dao.FilmDbStorage;
+import ru.yandex.practicum.filmorate.dao.FilmStorage;
 import ru.yandex.practicum.filmorate.dao.LikeFilmStorage;
 import ru.yandex.practicum.filmorate.model.Film;
 
@@ -11,7 +11,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class FilmService {
-    private final FilmDbStorage filmStorage;
+    private final FilmStorage filmStorage;
     private final LikeFilmStorage likeFilmStorage;
 
     public Film create(Film film) {

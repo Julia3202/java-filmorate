@@ -1,4 +1,10 @@
-
+delete from FILM_GENRE;
+delete from FILM_LIKE;
+delete from FILMS;
+delete from USER_FRIEND;
+delete from USERS;
+DELETE FROM GENRE;
+DELETE FROM MPA;
 INSERT INTO GENRE(GENRE_ID, GENRE_NAME) VALUES ( 1, 'Комедия' );
 INSERT INTO GENRE(GENRE_ID, GENRE_NAME) VALUES ( 2, 'Драма' );
 INSERT INTO GENRE(GENRE_ID, GENRE_NAME) VALUES ( 3, 'Мультфильм' );

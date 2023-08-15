@@ -6,9 +6,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
-import ru.yandex.practicum.filmorate.dao.FilmDbStorage;
+import ru.yandex.practicum.filmorate.dao.FilmStorage;
 import ru.yandex.practicum.filmorate.dao.LikeFilmStorage;
-import ru.yandex.practicum.filmorate.dao.UserDbStorage;
+import ru.yandex.practicum.filmorate.dao.UserStorage;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
@@ -22,11 +22,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest
 @AutoConfigureTestDatabase
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
-class JdbcLikeFilmStorageTest {
+class LikeFilmDbStorageTest {
 
-    private final FilmDbStorage filmDbStorage;
+    private final FilmStorage filmStorage;
     private final LikeFilmStorage likeFilmStorage;
-    private final UserDbStorage userDbStorage;
+    private final UserStorage userStorage;
 
     @BeforeEach
     void beforeEach() {
@@ -34,11 +34,11 @@ class JdbcLikeFilmStorageTest {
         Mpa mpa = new Mpa(5, "R-13");
         Film film = new Film(1, "testFilm", "testDescription", date, 1000, 5, mpa);
         film.setGenres(List.of(new Genre(1, "Комедия")));
-        filmDbStorage.create(film);
+        filmStorage.create(film);
 
         User user = new User("userMail@mail.ru", "userLogin", "userName",
                 LocalDate.of(2000, 1, 15));
-        userDbStorage.create(user);
+        userStorage.create(user);
     }
 
     @Test

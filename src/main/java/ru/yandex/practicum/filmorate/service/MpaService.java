@@ -2,7 +2,7 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.dao.MpaDbStorage;
+import ru.yandex.practicum.filmorate.dao.MpaStorage;
 import ru.yandex.practicum.filmorate.model.Mpa;
 
 import java.util.List;
@@ -11,13 +11,13 @@ import java.util.List;
 @AllArgsConstructor
 public class MpaService {
 
-    private final MpaDbStorage mpaDbStorage;
+    private final MpaStorage mpaStorage;
 
     public List<Mpa> getAllMpa() {
-        return mpaDbStorage.getAll();
+        return mpaStorage.getAll();
     }
 
     public Mpa findMpaNameById(Integer id) {
-        return mpaDbStorage.findMpaNameById(id);
+        return mpaStorage.findMpaNameById(id);
     }
 }

@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
-import ru.yandex.practicum.filmorate.dao.UserDbStorage;
+import ru.yandex.practicum.filmorate.dao.UserStorage;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.time.LocalDate;
@@ -18,9 +18,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest
 @AutoConfigureTestDatabase
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
-class JdbcUserStorageTest {
+class UserDbStorageTest {
 
-    private final UserDbStorage userDbStorage;
+    private final UserStorage userStorage;
 
     private User user;
     private User friend;
@@ -38,7 +38,7 @@ class JdbcUserStorageTest {
 
     @Test
     void create() {
-        User users = userDbStorage.create(user);
+        User users = userStorage.create(user);
         assertThat(users)
                 .hasFieldOrPropertyWithValue("email", "userMail@mail.ru")
                 .hasFieldOrPropertyWithValue("login", "userLogin")
@@ -49,8 +49,8 @@ class JdbcUserStorageTest {
     @Test
     void update() {
         LocalDate date = LocalDate.of(2000, 1, 15);
-        userDbStorage.create(user);
-        User newUser = userDbStorage.update(user);
+        userStorage.create(user);
+        User newUser = userStorage.update(user);
         assertThat(newUser)
                 .hasFieldOrPropertyWithValue("email", "userMail@mail.ru")
                 .hasFieldOrPropertyWithValue("login", "userLogin")
@@ -60,15 +60,15 @@ class JdbcUserStorageTest {
 
     @Test
     void findAll() {
-        userDbStorage.create(user);
-        List<User> userList = userDbStorage.findAll();
+        userStorage.create(user);
+        List<User> userList = userStorage.findAll();
         assertThat(userList.size()).isEqualTo(2);
     }
 
     @Test
     void findUserById() {
-        userDbStorage.create(user);
-        Optional<User> users = userDbStorage.findUserById(1);
+        userStorage.create(user);
+        Optional<User> users = userStorage.findUserById(1);
         assertThat(users)
                 .isPresent()
                 .hasValueSatisfying(user ->
@@ -81,35 +81,35 @@ class JdbcUserStorageTest {
 
     @Test
     void addFriends() {
-        userDbStorage.create(user);
-        userDbStorage.create(friend);
+        userStorage.create(user);
+        userStorage.create(friend);
         userId = user.getId();
         friendId = friend.getId();
-        userDbStorage.addFriends(userId, friendId);
-        List<User> friendList = userDbStorage.getAllFriends(userId);
+        userStorage.addFriends(userId, friendId);
+        List<User> friendList = userStorage.getAllFriends(userId);
         assertThat(friendList.size()).isEqualTo(1);
     }
 
     @Test
     void removeFriends() {
         addFriends();
-        userDbStorage.removeFriends(userId, friendId);
-        List<User> friendList = userDbStorage.getAllFriends(userId);
+        userStorage.removeFriends(userId, friendId);
+        List<User> friendList = userStorage.getAllFriends(userId);
         assertThat(friendList.size()).isEqualTo(0);
     }
 
     @Test
     void getMutualFriend() {
-        userDbStorage.create(user);
-        userDbStorage.create(friend);
+        userStorage.create(user);
+        userStorage.create(friend);
         userId = user.getId();
         friendId = friend.getId();
-        userDbStorage.addFriends(userId, friendId);
+        userStorage.addFriends(userId, friendId);
         User userTest = new User("test@mail.ru", "testLogin",
                 "testName", LocalDate.of(2001, 2, 12));
-        userDbStorage.create(userTest);
-        userDbStorage.addFriends(userTest.getId(), friendId);
-        List<User> mutualFriend = userDbStorage.getMutualFriend(userTest.getId(), userId);
+        userStorage.create(userTest);
+        userStorage.addFriends(userTest.getId(), friendId);
+        List<User> mutualFriend = userStorage.getMutualFriend(userTest.getId(), userId);
         assertThat(mutualFriend.size()).isEqualTo(1);
         assertThat(mutualFriend.get(0).getId()).isEqualTo(10);
     }

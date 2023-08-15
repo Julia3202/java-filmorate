@@ -2,7 +2,7 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.dao.GenreDbStorage;
+import ru.yandex.practicum.filmorate.dao.GenreStorage;
 import ru.yandex.practicum.filmorate.model.Genre;
 
 import java.util.List;
@@ -11,18 +11,18 @@ import java.util.List;
 @RequiredArgsConstructor
 public class GenreService {
 
-    private final GenreDbStorage genreDbStorage;
+    private final GenreStorage genreStorage;
 
     public List<Genre> findAllGenre() {
-        return genreDbStorage.findAllGenre();
+        return genreStorage.findAllGenre();
     }
 
     public Genre findGenreByIds(Integer id) {
-        return genreDbStorage.findGenreByIds(id);
+        return genreStorage.findGenreByIds(id);
     }
 
     public List<Genre> findGenreByFilmId(Integer id) {
-        return genreDbStorage.findGenreByFilmId(id);
+        return genreStorage.findGenreByFilmId(id);
     }
 
 

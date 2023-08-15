@@ -15,11 +15,11 @@ import java.util.Map;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class JdbcLikeFilmStorage implements LikeFilmStorage {
+public class LikeFilmDbStorage implements LikeFilmStorage {
 
     private final NamedParameterJdbcOperations jdbcOperations;
-    private final FilmDbStorage filmDbStorage;
-    private final UserDbStorage userStorage;
+    private final FilmStorage filmStorage;
+    private final UserStorage userStorage;
 
     @Override
     public List<Film> findPopularFilm(Integer count) {
@@ -29,7 +29,7 @@ public class JdbcLikeFilmStorage implements LikeFilmStorage {
                 "left join FILM_LIKE l on f.FILM_ID = l.FILM_ID " +
                 "group by f.FILM_ID " +
                 "order by rate desc limit :count");
-        return jdbcOperations.query(sqlQuery, Map.of("count", count), (rs, rowNum) -> filmDbStorage.makeFilm(rs));
+        return jdbcOperations.query(sqlQuery, Map.of("count", count), (rs, rowNum) -> filmStorage.makeFilm(rs));
     }
 
     @Override
@@ -61,7 +61,7 @@ public class JdbcLikeFilmStorage implements LikeFilmStorage {
         if (userStorage.findUserById(userId).isEmpty()) {
             throw new NotFoundException("Пользователь не найден.");
         }
-        if (filmDbStorage.findFilmById(id) == null) {
+        if (filmStorage.findFilmById(id) == null) {
             throw new NotFoundException("Фильм не найден.");
         }
         String sqlQuery = "select user_id from FILM_LIKE where FILM_ID = :filmId and USER_ID = :userId";
