@@ -48,7 +48,7 @@ public class JdbcFilmStorage implements FilmDbStorage {
         jdbcOperations.update(sqlQuery, map, keyHolder);
         Integer filmId = Objects.requireNonNull(keyHolder.getKey()).intValue();
         film.setId(filmId);
-        if (film.getGenres() != null && !film.getGenres().isEmpty()) {
+        if (!film.getGenres().isEmpty()) {
             List<Genre> genreList = film.getGenres().stream()
                     .distinct()
                     .collect(Collectors.toList());
