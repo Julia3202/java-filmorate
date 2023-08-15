@@ -15,6 +15,7 @@ import java.util.List;
 
 @Slf4j
 @RestController
+@RequestMapping("/users")
 public class UserController {
     private final UserService userService;
 
@@ -23,48 +24,47 @@ public class UserController {
         this.userService = userService;
     }
 
-    @PostMapping(value = "/users")
+    @PostMapping
     public User create(@Valid @RequestBody User user) throws ValidationException {
         return userService.create(user);
     }
 
-    @PutMapping("/users")
+    @PutMapping
     public User update(@Valid @RequestBody User user) throws ValidationException {
         return userService.update(user);
     }
 
-    @GetMapping("/users")
-    public Collection<User> findAll() throws ClassNotFoundException {
+    @GetMapping
+    public Collection<User> findAll() throws NotFoundException {
         return userService.findAll();
     }
 
-    @GetMapping("/users/{id}")
+    @GetMapping("/{id}")
     public User findUserById(@PathVariable("id") Integer id)
-            throws ClassNotFoundException, ValidationException {
+            throws NotFoundException, ValidationException {
         return userService.findUserById(id);
     }
 
-    @PutMapping("/users/{id}/friends/{friendId}")
+    @PutMapping("/{id}/friends/{friendId}")
     public void addFriends(@PathVariable("id") Integer id, @PathVariable("friendId") Integer friendId)
             throws OtherException {
         userService.addFriends(id, friendId);
     }
 
-    @DeleteMapping("/users/{id}/friends/{friendId}")
+    @DeleteMapping("/{id}/friends/{friendId}")
     public void removeFriends(@PathVariable("id") Integer id, @PathVariable("friendId") Integer friendId)
             throws NotFoundException {
         userService.removeFriends(id, friendId);
     }
 
-    @GetMapping("/users/{id}/friends")
+    @GetMapping("/{id}/friends")
     public List<User> getAllFriends(@PathVariable("id") Integer id) throws NotFoundException {
         return userService.getAllFriends(id);
     }
 
-    @GetMapping("/users/{id}/friends/common/{otherId}")
+    @GetMapping("/{id}/friends/common/{otherId}")
     public List<User> getMutualFriend(@PathVariable("id") Integer id, @PathVariable("otherId") Integer otherId)
             throws NotFoundException {
         return userService.getMutualFriend(id, otherId);
     }
 }
-

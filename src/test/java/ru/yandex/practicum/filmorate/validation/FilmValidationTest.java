@@ -5,6 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Mpa;
 
 import java.time.LocalDate;
 
@@ -14,11 +15,13 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 class FilmValidationTest {
     private FilmValidation filmValidation;
     private Film film;
+    private Mpa mpa;
 
     @BeforeEach
     public void beforeEach() {
         LocalDate date = LocalDate.of(2012, 5, 4);
-        film = new Film("testFilm", "testDescription", date, 1000);
+        mpa = new Mpa(5, "R-13");
+        film = new Film(1, "testFilm", "testDescription", date, 1000, 5, mpa);
     }
 
     @Test
