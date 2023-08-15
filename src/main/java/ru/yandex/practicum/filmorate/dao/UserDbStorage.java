@@ -138,11 +138,9 @@ public class UserDbStorage implements UserStorage {
         }
         if (getAllFriends(id).isEmpty()) {
             log.info("У пользователя с ID = {} нет друзей в списке.", id);
-            throw new NotFoundException("У пользователя с ID = " + id + " нет друзей в списке.");
         }
         if (getAllFriends(otherId).isEmpty()) {
             log.info("У пользователя с ID = {} нет друзей в списке.", otherId);
-            throw new NotFoundException("У пользователя с ID = " + otherId + " нет друзей в списке.");
         }
         String query = "SELECT * from USERS where USER_ID in" +
                 " (select FRIEND_ID from USER_FRIEND where USER_ID = :userId " +
