@@ -53,4 +53,10 @@ public class FilmController {
     public List<Film> findPopularFilm(@RequestParam(value = "count", defaultValue = "10") Integer count) {
         return filmService.findPopularFilm(count);
     }
+    @GetMapping("/common")
+    public List<Film> findCommonFilm(@RequestParam("userId") long userId,
+                                     @RequestParam("friendId") long friendId) {
+        //log.info("Найти список общих фильмов у пользователей с id --> {} и с id --> {}.", userId, friendId);
+        return filmService.findCommonFilm(userId, friendId);
+    }
 }

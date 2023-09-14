@@ -41,4 +41,7 @@ public class FilmService {
     public List<Film> findPopularFilm(Integer count) {
         return likeFilmStorage.findPopularFilm(count);
     }
+
+    public List<Film> findCommonFilm(long userId, long friendId) { return filmStorage.findCommonFilm(userId, friendId);
+    }
 }

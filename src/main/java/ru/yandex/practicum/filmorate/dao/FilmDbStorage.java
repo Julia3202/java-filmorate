@@ -131,4 +131,18 @@ public class FilmDbStorage implements FilmStorage {
         film.setGenres(genreStorage.findGenreByFilmId(id));
         return film;
     }
+
+    @Override
+    public List<Film> findCommonFilm(long userId, long friendId) {
+        String sqlQuery = "SELECT f.*, M.MPA_NAME FROM films f " +
+                "INNER JOIN MPA M on F.MPA_ID = M.MPA_ID " +
+                "WHERE film_id IN " +
+                "(SELECT film_id FROM FILM_LIKE WHERE user_id = :userId " +
+                "INTERSECT SELECT film_id FROM FILM_LIKE WHERE user_id = :friendId )";
+
+        List<Film> films = jdbcOperations.query(sqlQuery, Map.of("userId", userId, "friendId", friendId),
+                (rs, rowNum) -> makeFilm(rs));
+
+        return films;
+    }
 }

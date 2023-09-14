@@ -19,4 +19,6 @@ public interface FilmStorage {
     Film findFilmById(Integer id) throws NotFoundException;
 
     Film makeFilm(ResultSet rs) throws SQLException;
+
+    List<Film> findCommonFilm(long userId, long friendId);
 }
